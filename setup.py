@@ -116,17 +116,17 @@ def build_packages(static_build: bool = False) -> None:
     subprocess.run(["conan", "profile", "detect", "--force"], check=True)
     profile_name = "default"
 
-    # # LibRaw
-    # libraw_dep_dir = here / "oiio_python" / "recipes" / "dependencies" / "libraw"
-    # libraw_version = "0.21.2"
+    # LibRaw
+    libraw_dep_dir = here / "oiio_python" / "recipes" / "dependencies" / "libraw"
+    libraw_version = "0.21.2"
 
-    # conan_install_package(libraw_dep_dir, libraw_version, profile=profile_name)
+    conan_install_package(libraw_dep_dir, libraw_version, profile=profile_name)
 
-    # # OpenColorIO
-    # ocio_dep_dir = here / "oiio_python" / "recipes" / "opencolorio"
-    # ocio_version = "2.2.1"
+    # OpenColorIO
+    ocio_dep_dir = here / "oiio_python" / "recipes" / "opencolorio"
+    ocio_version = "2.2.1"
 
-    # conan_install_package(ocio_dep_dir, ocio_version, profile=profile_name)
+    conan_install_package(ocio_dep_dir, ocio_version, profile=profile_name)
 
     # OpenImageIO
     oiio_dir = here / "oiio_python" / "recipes" / "openimageio"
@@ -148,8 +148,8 @@ def build_packages(static_build: bool = False) -> None:
         shutil.copyfile(loaders_dir / "ocio_loader_win.py", ocio_pkg_dir / "__init__.py")
         shutil.copyfile(loaders_dir / "oiio_loader_win.py", oiio_pkg_dir / "__init__.py")
     else:
-        shutil.copyfile(loaders_dir / "ocio_loader.py", ocio_pkg_dir / "loaders.py")
-        shutil.copyfile(loaders_dir / "oiio_loader.py", oiio_pkg_dir / "loaders.py")
+        shutil.copyfile(loaders_dir / "ocio_loader.py", ocio_pkg_dir / "__init__.py")
+        shutil.copyfile(loaders_dir / "oiio_loader.py", oiio_pkg_dir / "__init__.py")
 
     if not static_build:
         # Copy tool wrappers
@@ -164,16 +164,16 @@ def build_packages(static_build: bool = False) -> None:
     # Clean build dirs
     shutil.rmtree(oiio_dir / "build")
     shutil.rmtree(oiio_dir / "src")
-    # shutil.rmtree(ocio_dep_dir / "build")
-    # shutil.rmtree(ocio_dep_dir / "src")
-    # shutil.rmtree(libraw_dep_dir / "build")
-    # shutil.rmtree(libraw_dep_dir / "src")
-    # shutil.rmtree(ocio_dep_dir / "test_package" / "build")
-    # os.remove(ocio_dep_dir / "test_package" / "CMakeUserPresets.json")
+    shutil.rmtree(ocio_dep_dir / "build")
+    shutil.rmtree(ocio_dep_dir / "src")
+    shutil.rmtree(libraw_dep_dir / "build")
+    shutil.rmtree(libraw_dep_dir / "src")
+    shutil.rmtree(ocio_dep_dir / "test_package" / "build")
+    os.remove(ocio_dep_dir / "test_package" / "CMakeUserPresets.json")
     shutil.rmtree(oiio_dir / "test_package" / "build")
     os.remove(oiio_dir / "test_package" / "CMakeUserPresets.json")
-    # shutil.rmtree(libraw_dep_dir / "test_package" / "build")
-    # os.remove(libraw_dep_dir / "test_package" / "CMakeUserPresets.json")
+    shutil.rmtree(libraw_dep_dir / "test_package" / "build")
+    os.remove(libraw_dep_dir / "test_package" / "CMakeUserPresets.json")
 
 
 if platform.system() == "Windows":
@@ -190,44 +190,6 @@ else:
 class BinaryDistribution(Distribution):
     def has_ext_modules(self):
         return True
-
-
-def debug_repair_library() -> None:
-    """
-    Print the contents of the REPAIR_LIBRARY directory and their architectures.
-    """
-    libs_dir = Path(os.getenv("PROJECT_ROOT"))
-    libs_dir = libs_dir / "oiio_python" / "libs"
-
-    print("libs_dir", libs_dir)
-
-    print("$PWD", os.getenv("PWD"))
-    print("$PROJECT_ROOT", os.getenv("PROJECT_ROOT"))
-    print("$OIIO_LIBS_DIR", os.getenv("OIIO_LIBS_DIR"))
-
-    print("\n" + "=" * 80)
-    print("DEBUG: Inspecting libraries in REPAIR_LIBRARY:")
-    if not libs_dir.exists():
-        print(f"ERROR: REPAIR_LIBRARY path does not exist: {libs_dir}")
-        print("=" * 80 + "\n")
-        return
-
-    for lib_path in libs_dir.glob("*"):
-        print(f"Inspecting: {lib_path}")
-        if lib_path.is_file():
-            try:
-                result = subprocess.run(
-                    ["lipo", "-info", str(lib_path)],
-                    capture_output=True,
-                    text=True,
-                    check=True,
-                )
-                print(f"  -> Architecture(s): {result.stdout.strip()}")
-            except subprocess.CalledProcessError as e:
-                print(f"  -> ERROR inspecting {lib_path}: {e.stderr.strip()}")
-        else:
-            print(f"  -> Skipping non-file: {lib_path}")
-    print("=" * 80 + "\n")
 
 
 def print_directory_tree(startpath, max_level=None):
@@ -269,14 +231,6 @@ if __name__ == "__main__":
     if "bdist_wheel" in sys.argv:
         conan_profile_ensure()
         build_packages(static_build)
-
-        if platform.system() == "Darwin":
-            debug_repair_library()
-
-        
-        print_directory_tree(here)
-
-        print_directory_tree(here / "oiio_python")
 
         # Fix shared libraries on macos
         if not static_build and platform.system() == "Darwin":

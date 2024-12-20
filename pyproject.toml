@@ -2,6 +2,7 @@
 build-backend = "setuptools.build_meta"
 requires = [
   "setuptools>=64",
+  "setuptools-scm==8.1.0"
   "wheel",
   "conan==2.4.0",
   "numpy>=1.21.2,<2.0.0",
@@ -15,7 +16,7 @@ skip = [
   "pp*", # Disable building PyPy wheels on all platforms
   "*-win32", # Skip 32-bit builds
   "*-manylinux_i686", # Skip 32-bit builds
-  "cp38-macosx_arm64", # Skip building for Python 3.8 on Apple Silicon
+  # "cp38-macosx_arm64", # Skip building for Python 3.8 on Apple Silicon
 ]
 test-command = "python {project}/test.py"
 
