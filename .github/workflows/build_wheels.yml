@@ -60,6 +60,13 @@ jobs:
           CIBW_ARCHS_MACOS: ${{ env.CIBW_ARCHS_MACOS || null }}
         with:
           output-dir: wheelhouse
+      
+      - name: Debug REPAIR_LIBRARY
+        if: runner.os == 'macOS'
+        run: |
+          echo "Contents of REPAIR_LIBRARY:"
+          ls $PWD/oiio_python/libs
+          file $PWD/oiio_python/libs/*.dylib
 
       - uses: actions/upload-artifact@v4
         with:
