@@ -52,24 +52,44 @@ class OpenImageIOConan(ConanFile):
         "with_tools": [True, False],
     }
     default_options = {
+        # "shared": os.getenv("OIIO_STATIC") != "1",
+        # "fPIC": True,
+        # "with_libjpeg": "libjpeg",
+        # "with_libpng": True,
+        # "with_freetype": True,
+        # "with_hdf5": True,
+        # "with_opencolorio": True,
+        # "with_opencv": False,
+        # "with_tbb": True,
+        # "with_dicom": False,  # Heavy dependency, disabled by default
+        # "with_ffmpeg": False,
+        # "with_giflib": True,
+        # "with_libheif": False,
+        # "with_raw": True,  # libraw is available under CDDL-1.0 or LGPL-2.1, for this reason it is disabled by default
+        # "with_openjpeg": True,
+        # "with_openvdb": False,  # FIXME: broken on M1
+        # "with_ptex": True,
+        # "with_libwebp": True,
+        # "with_tools": os.getenv("OIIO_STATIC") != "1",
+
         "shared": os.getenv("OIIO_STATIC") != "1",
         "fPIC": True,
         "with_libjpeg": "libjpeg",
-        "with_libpng": True,
-        "with_freetype": True,
-        "with_hdf5": True,
-        "with_opencolorio": True,
+        "with_libpng": False,
+        "with_freetype": False,
+        "with_hdf5": False,
+        "with_opencolorio": False,
         "with_opencv": False,
-        "with_tbb": True,
+        "with_tbb": False,
         "with_dicom": False,  # Heavy dependency, disabled by default
         "with_ffmpeg": False,
-        "with_giflib": True,
+        "with_giflib": False,
         "with_libheif": False,
-        "with_raw": True,  # libraw is available under CDDL-1.0 or LGPL-2.1, for this reason it is disabled by default
-        "with_openjpeg": True,
+        "with_raw": False,  # libraw is available under CDDL-1.0 or LGPL-2.1, for this reason it is disabled by default
+        "with_openjpeg": False,
         "with_openvdb": False,  # FIXME: broken on M1
-        "with_ptex": True,
-        "with_libwebp": True,
+        "with_ptex": False,
+        "with_libwebp": False,
         "with_tools": os.getenv("OIIO_STATIC") != "1",
     }
 

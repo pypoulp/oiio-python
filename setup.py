@@ -116,17 +116,17 @@ def build_packages(static_build: bool = False) -> None:
     subprocess.run(["conan", "profile", "detect", "--force"], check=True)
     profile_name = "default"
 
-    # LibRaw
-    libraw_dep_dir = here / "oiio_python" / "recipes" / "dependencies" / "libraw"
-    libraw_version = "0.21.2"
+    # # LibRaw
+    # libraw_dep_dir = here / "oiio_python" / "recipes" / "dependencies" / "libraw"
+    # libraw_version = "0.21.2"
 
-    conan_install_package(libraw_dep_dir, libraw_version, profile=profile_name)
+    # conan_install_package(libraw_dep_dir, libraw_version, profile=profile_name)
 
-    # OpenColorIO
-    ocio_dep_dir = here / "oiio_python" / "recipes" / "opencolorio"
-    ocio_version = "2.2.1"
+    # # OpenColorIO
+    # ocio_dep_dir = here / "oiio_python" / "recipes" / "opencolorio"
+    # ocio_version = "2.2.1"
 
-    conan_install_package(ocio_dep_dir, ocio_version, profile=profile_name)
+    # conan_install_package(ocio_dep_dir, ocio_version, profile=profile_name)
 
     # OpenImageIO
     oiio_dir = here / "oiio_python" / "recipes" / "openimageio"
@@ -164,16 +164,16 @@ def build_packages(static_build: bool = False) -> None:
     # Clean build dirs
     shutil.rmtree(oiio_dir / "build")
     shutil.rmtree(oiio_dir / "src")
-    shutil.rmtree(ocio_dep_dir / "build")
-    shutil.rmtree(ocio_dep_dir / "src")
-    shutil.rmtree(libraw_dep_dir / "build")
-    shutil.rmtree(libraw_dep_dir / "src")
-    shutil.rmtree(ocio_dep_dir / "test_package" / "build")
-    os.remove(ocio_dep_dir / "test_package" / "CMakeUserPresets.json")
+    # shutil.rmtree(ocio_dep_dir / "build")
+    # shutil.rmtree(ocio_dep_dir / "src")
+    # shutil.rmtree(libraw_dep_dir / "build")
+    # shutil.rmtree(libraw_dep_dir / "src")
+    # shutil.rmtree(ocio_dep_dir / "test_package" / "build")
+    # os.remove(ocio_dep_dir / "test_package" / "CMakeUserPresets.json")
     shutil.rmtree(oiio_dir / "test_package" / "build")
     os.remove(oiio_dir / "test_package" / "CMakeUserPresets.json")
-    shutil.rmtree(libraw_dep_dir / "test_package" / "build")
-    os.remove(libraw_dep_dir / "test_package" / "CMakeUserPresets.json")
+    # shutil.rmtree(libraw_dep_dir / "test_package" / "build")
+    # os.remove(libraw_dep_dir / "test_package" / "CMakeUserPresets.json")
 
 
 if platform.system() == "Windows":
@@ -230,6 +230,30 @@ def debug_repair_library() -> None:
     print("=" * 80 + "\n")
 
 
+def print_directory_tree(startpath, max_level=None):
+    """
+    Print the directory tree starting from `startpath`.
+    
+    Args:
+        startpath (str): The root directory to print the tree for.
+        max_level (int, optional): Maximum depth of the tree to display. Defaults to None (no limit).
+    """
+    for root, dirs, files in os.walk(startpath):
+        # Calculate the depth of the current directory
+        level = root.replace(startpath, "").count(os.sep)
+        
+        # Limit depth if max_level is specified
+        if max_level is not None and level > max_level:
+            continue
+        
+        indent = " " * 4 * level
+        print(f"{indent}[DIR] {os.path.basename(root)}/")
+        
+        sub_indent = " " * 4 * (level + 1)
+        for f in files:
+            print(f"{sub_indent}[FILE] {f}")
+
+
 if __name__ == "__main__":
 
     static_build = os.getenv("OIIO_STATIC") == "1"
@@ -247,6 +271,11 @@ if __name__ == "__main__":
 
         if platform.system() == "Darwin":
             debug_repair_library()
+
+        
+        print_directory_tree(here)
+
+        print_directory_tree(here / "oiio_python")
 
         # Fix shared libraries on macos
         if not static_build and platform.system() == "Darwin":
