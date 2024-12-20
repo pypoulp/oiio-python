@@ -10,7 +10,7 @@ requires = [
 # =======================[ CIBUILDWHEEL ]======================
 
 [tool.cibuildwheel]
-build-frontend = {name = "build", args = ["--no-isolation"]}
+build-frontend = {name = "build"}
 skip = [
   "pp*", # Disable building PyPy wheels on all platforms
   "*-win32", # Skip 32-bit builds
