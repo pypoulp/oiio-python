@@ -37,6 +37,14 @@ jobs:
           echo "ARCHFLAGS=-arch arm64" >> $GITHUB_ENV
           echo "CIBW_ARCHS_MACOS=arm64" >> $GITHUB_ENV
 
+      - name: Set environment for Intel builds on macOS 13
+        if: runner.os == 'macOS' && matrix.os == 'macos-13'
+        run: |
+          echo "CFLAGS=-arch x86_64" >> $GITHUB_ENV
+          echo "LDFLAGS=-arch x86_64" >> $GITHUB_ENV
+          echo "ARCHFLAGS=-arch x86_64" >> $GITHUB_ENV
+          echo "CIBW_ARCHS_MACOS=x86_64" >> $GITHUB_ENV
+
       - name: Set CIBW_PLATFORM for Windows
         if: runner.os == 'Windows'
         run: echo "CIBW_PLATFORM=windows" >> $GITHUB_ENV
