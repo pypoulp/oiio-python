@@ -1,0 +1,20 @@
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).parent.resolve()
+
+
+def _run_tool(tool_name: str) -> None:
+    tool_path = HERE / "tools" / tool_name
+    oiio_bin_path = HERE
+    ocio_bin_path = HERE.parent / "PyOpenColorIO"
+
+    env = os.environ.copy()
+    env["PATH"] = os.environ["PATH"] + os.pathsep + str(ocio_bin_path) + os.pathsep + str(oiio_bin_path)
+    subprocess.run([str(tool_path)] + sys.argv[1:], check=True, env=env)
+
+
+def oiiotool() -> None:
+    _run_tool("oiiotool")

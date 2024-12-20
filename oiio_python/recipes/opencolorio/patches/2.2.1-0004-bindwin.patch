@@ -1,0 +1,19 @@
+diff --git a/src/bindings/python/PyUtils.h b/src/bindings/python/PyUtils.h
+index e4a525d..2ac48eb 100644
+--- a/src/bindings/python/PyUtils.h
++++ b/src/bindings/python/PyUtils.h
+@@ -1,6 +1,14 @@
+ // SPDX-License-Identifier: BSD-3-Clause
+ // Copyright Contributors to the OpenColorIO Project.
+ 
++#ifdef _WIN32
++    #include <BaseTsd.h>
++    namespace pybind11 {
++        typedef ::SSIZE_T SSIZE_T;
++    }
++#endif
++
++
+ #ifndef INCLUDED_OCIO_PYUTILS_H
+ #define INCLUDED_OCIO_PYUTILS_H
+ 

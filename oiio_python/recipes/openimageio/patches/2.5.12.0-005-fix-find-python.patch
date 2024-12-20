@@ -1,0 +1,61 @@
+--- CMakeLists.txt
++++ CMakeLists.txt
+@@ -245,10 +245,16 @@
+         add_subdirectory (${plugin_dir})
+     endforeach ()
+ endif ()
+-
+-if (USE_PYTHON AND Python_Development_FOUND AND NOT BUILD_OIIOUTIL_ONLY)
+-    add_subdirectory (src/python)
+-endif ()
++if (WIN32)
++    if (USE_PYTHON AND Python_Development_FOUND AND NOT BUILD_OIIOUTIL_ONLY)
++        add_subdirectory (src/python)
++    endif ()
++else ()
++    if (USE_PYTHON AND Python_Development.Module_FOUND AND NOT BUILD_OIIOUTIL_ONLY)
++        add_subdirectory (src/python)
++    endif ()
++endif()
++    
+ 
+ add_subdirectory (src/include)
+ if (BUILD_DOCS)
+--- src/cmake/pythonutils.cmake
++++ src/cmake/pythonutils.cmake
+@@ -10,8 +10,10 @@
+ set (PYMODULE_SUFFIX "" CACHE STRING "Suffix to add to Python module init namespace")
+ if (WIN32)
+     set (PYLIB_LIB_TYPE SHARED CACHE STRING "Type of library to build for python module (MODULE or SHARED)")
++    set (PY_DEV_REQUIRED Development)
+ else ()
+     set (PYLIB_LIB_TYPE MODULE CACHE STRING "Type of library to build for python module (MODULE or SHARED)")
++    set (PY_DEV_REQUIRED Development.Module)
+ endif ()
+ 
+ 
+@@ -32,13 +34,16 @@
+             list (APPEND _req EXACT)
+         endif ()
+     endif ()
++
++
+     checked_find_package (Python ${PYTHON_VERSION}
+-                          ${_req}
+-                          COMPONENTS Interpreter Development
+-                          PRINT Python_VERSION Python_EXECUTABLE
++                        ${_req}
++                        COMPONENTS Interpreter ${PY_DEV_REQUIRED}
++                        PRINT Python_VERSION Python_EXECUTABLE
+                                 Python_LIBRARIES
+                                 Python_Development_FOUND
+                                 Python_Interpreter_FOUND )
++
+ 
+     # The version that was found may not be the default or user
+     # defined one.
+@@ -139,4 +144,3 @@
+     install(FILES __init__.py DESTINATION ${PYTHON_SITE_DIR})
+ 
+ endmacro ()
+-

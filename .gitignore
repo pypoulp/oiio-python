@@ -1,3 +1,9 @@
+# Project specific
+package/
+oiio_python/libs/
+oiio_python/OpenImageIO/*
+oiio_python/PyOpenColorIO/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
