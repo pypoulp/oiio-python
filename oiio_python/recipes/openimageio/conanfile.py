@@ -89,7 +89,7 @@ class OpenImageIOConan(ConanFile):
         "with_openjpeg": False,
         "with_openvdb": False,  # FIXME: broken on M1
         "with_ptex": False,
-        "with_libwebp": False,
+        "with_libwebp": True,
         "with_tools": os.getenv("OIIO_STATIC") != "1",
     }
 
