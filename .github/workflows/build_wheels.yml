@@ -63,7 +63,6 @@ jobs:
           output-dir: wheelhouse
       
       - name: Debug REPAIR_LIBRARY
-        if: runner.os == 'macOS'
         run: |
           echo "Contents of REPAIR_LIBRARY:"
           for file in $PWD/oiio_python/libs/*; do
