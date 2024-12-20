@@ -11,7 +11,7 @@ jobs:
       matrix:
         # macos-13 is an intel runner, macos-14 is apple silicon
         # os: [ubuntu-latest, windows-latest, macos-13, macos-14]
-        os: [macos-13, macos-14]
+        os: [macos-14]
 
     steps:
       - uses: actions/checkout@v4
@@ -24,22 +24,14 @@ jobs:
 
       - name: Set MACOSX_DEPLOYMENT_TARGET for macOS x86_64
         if: runner.os == 'macOS' && matrix.os == 'macos-13'
-        run: echo "MACOSX_DEPLOYMENT_TARGET=10.13" >> $GITHUB_ENV
+        run: |
+          echo "MACOSX_DEPLOYMENT_TARGET=10.13" >> $GITHUB_ENV
+          echo "CIBW_PLATFORM=macos" >> $GITHUB_ENV
 
       - name: Set MACOSX_DEPLOYMENT_TARGET for macOS arm64
         if: runner.os == 'macOS' && matrix.os == 'macos-14'
-        run: echo "MACOSX_DEPLOYMENT_TARGET=14.0" >> $GITHUB_ENV
-
-      - name: Force ARM build on macOS 14
-        if: runner.os == 'macOS' && matrix.os == 'macos-14'
         run: |
-          echo "CIBW_ARCHS_MACOS=arm64" >> $GITHUB_ENV
-          echo "CIBW_PLATFORM=macos" >> $GITHUB_ENV
-
-      - name: Set environment for Intel builds on macOS 13
-        if: runner.os == 'macOS' && matrix.os == 'macos-13'
-        run: |
-          echo "CIBW_ARCHS_MACOS=x86_64" >> $GITHUB_ENV
+          echo "MACOSX_DEPLOYMENT_TARGET=14.0" >> $GITHUB_ENV
           echo "CIBW_PLATFORM=macos" >> $GITHUB_ENV
 
       - name: Set CIBW_PLATFORM for Windows
@@ -51,10 +43,9 @@ jobs:
         env:
           MACOSX_DEPLOYMENT_TARGET: ${{ env.MACOSX_DEPLOYMENT_TARGET }}
           CIBW_PLATFORM: ${{ env.CIBW_PLATFORM }}
-          CIBW_ARCHS_MACOS: ${{ env.CIBW_ARCHS_MACOS || null }}
         with:
           output-dir: wheelhouse
-      
+
       - name: Debug REPAIR_LIBRARY
         run: |
           echo "Contents of REPAIR_LIBRARY:"
