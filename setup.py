@@ -44,7 +44,7 @@ def conan_install_package(
     build_arg_list = []
     if platform.system() == "Linux":
         # Build everything on Linux to maximize compatibility on ManyLinux
-        build_arg_list.append("--build=missing")
+        build_arg_list.append("--build=*")
     else:
         for b in to_build:
             build_arg = f"--build={b}"
