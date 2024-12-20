@@ -196,7 +196,11 @@ def debug_repair_library() -> None:
     """
     Print the contents of the REPAIR_LIBRARY directory and their architectures.
     """
-    libs_dir = Path(os.getenv("OIIO_LIBS_DIR", "$PWD/oiio_python/libs"))
+    libs_dir = Path(os.getenv("PROJECT_ROOT"))
+    libs_dir = libs_dir / "oiio_python" / "libs"
+
+    print("libs_dir", libs_dir)
+
     print("$PWD", os.getenv("PWD"))
     print("$PROJECT_ROOT", os.getenv("PROJECT_ROOT"))
     print("$OIIO_LIBS_DIR", os.getenv("OIIO_LIBS_DIR"))
