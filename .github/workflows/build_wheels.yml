@@ -29,6 +29,14 @@ jobs:
         if: runner.os == 'macOS' && matrix.os == 'macos-14'
         run: echo "MACOSX_DEPLOYMENT_TARGET=14.0" >> $GITHUB_ENV
 
+      - name: Force ARM build on macOS 14
+        if: runner.os == 'macOS' && matrix.os == 'macos-14'
+        run: |
+          echo "CFLAGS=-arch arm64" >> $GITHUB_ENV
+          echo "LDFLAGS=-arch arm64" >> $GITHUB_ENV
+          echo "ARCHFLAGS=-arch arm64" >> $GITHUB_ENV
+          echo "CIBW_ARCHS_MACOS=arm64" >> $GITHUB_ENV
+
       - name: Set CIBW_PLATFORM for Windows
         if: runner.os == 'Windows'
         run: echo "CIBW_PLATFORM=windows" >> $GITHUB_ENV
@@ -38,6 +46,10 @@ jobs:
         env:
           MACOSX_DEPLOYMENT_TARGET: ${{ env.MACOSX_DEPLOYMENT_TARGET }}
           CIBW_PLATFORM: ${{ env.CIBW_PLATFORM }}
+          CFLAGS: ${{ env.CFLAGS }}
+          LDFLAGS: ${{ env.LDFLAGS }}
+          ARCHFLAGS: ${{ env.ARCHFLAGS }}
+          CIBW_ARCHS_MACOS: ${{ env.CIBW_ARCHS_MACOS }}
         with:
           package-dir: .
           output-dir: wheelhouse
