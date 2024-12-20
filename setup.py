@@ -18,9 +18,21 @@ def conan_profile_ensure() -> None:
     )
     profiles = list_profiles_output.stdout.strip().splitlines()
     if "default" not in profiles:
+
+        system = platform.system()
+        machine = platform.machine()
+
         print("Default Conan profile not found. Running 'conan profile detect'.")
+
+        if system == "Darwin" and machine == "arm64":
+            print("Running Conan profile detection for macOS ARM64.")
+            detect_command = ["arch", "-arm64", "conan", "profile", "detect", "--force"]
+        else:
+            print(f"Running Conan profile detection for {system} on {machine}.")
+            detect_command = ["conan", "profile", "detect", "--force"]
+
         # Run 'conan profile detect'
-        detect_output = subprocess.run(["conan", "profile", "detect"], capture_output=True, text=True, check=True)
+        detect_output = subprocess.run(detect_command, capture_output=True, text=True, check=True)
         if detect_output.returncode == 0:
             print("Conan Profile detected successfully.")
         else:
