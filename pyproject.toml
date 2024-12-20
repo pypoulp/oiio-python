@@ -23,7 +23,6 @@ test-command = "python {project}/test.py"
 before-all = [
   "brew install cmake",
 ]
-
 repair-wheel-command = [
   "export REPAIR_LIBRARY=$PWD/oiio_python/libs:$DYLD_LIBRARY_PATH",
   "DYLD_LIBRARY_PATH=$REPAIR_LIBRARY delocate-wheel -w {dest_dir} -v {wheel} -e \"$HOME/.conan2\"",
