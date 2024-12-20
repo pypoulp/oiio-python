@@ -66,8 +66,15 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           echo "Contents of REPAIR_LIBRARY:"
-          ls $PWD/oiio_python/libs
-          file $PWD/oiio_python/libs/*.dylib
+          for file in $PWD/oiio_python/libs/*; do
+            echo "Inspecting $file"
+            archs=$(lipo -info "$file" 2>/dev/null | grep -oE "arm64|x86_64" | tr '\n' ' ')
+            if [[ -z "$archs" ]]; then
+              echo "  -> Architecture: UNKNOWN or not a valid binary"
+            else
+              echo "  -> Architecture(s): $archs"
+            fi
+          done
 
       - uses: actions/upload-artifact@v4
         with:
