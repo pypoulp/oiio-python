@@ -23,10 +23,15 @@ jobs:
         if: runner.os == 'macOS' && matrix.os == 'macos-14'
         run: echo "MACOSX_DEPLOYMENT_TARGET=14.0" >> $GITHUB_ENV
 
+      - name: Set CIBW_PLATFORM for Windows
+        if: runner.os == 'Windows'
+        run: echo "CIBW_PLATFORM=windows" >> $GITHUB_ENV
+
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.22.0
         env:
           MACOSX_DEPLOYMENT_TARGET: ${{ env.MACOSX_DEPLOYMENT_TARGET }}
+          CIBW_PLATFORM: ${{ env.CIBW_PLATFORM }}
         with:
           package-dir: .
           output-dir: wheelhouse
