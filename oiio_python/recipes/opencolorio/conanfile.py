@@ -30,6 +30,7 @@ class OpenColorIOConan(ConanFile):
         "fPIC": True,
         "use_sse": True,
     }
+    tool_requires = "cmake/[>=3.16 <4]"
 
     def export_sources(self):
         export_conandata_patches(self)
@@ -47,6 +48,11 @@ class OpenColorIOConan(ConanFile):
         self.options["pystring"].shared = False
         self.options["lcms"].shared = False
 
+        # Set minizip-ng options for macOS
+        if is_apple_os(self):
+            self.options["minizip-ng"].with_zlib = True
+            self.options["minizip-ng"].with_libcomp = False
+
     def configure(self):
         if self.options.shared:
             self.options.rm_safe("fPIC")
@@ -56,9 +62,6 @@ class OpenColorIOConan(ConanFile):
 
     def requirements(self):
         self.requires("expat/[>=2.6.2 <3]")
-
-        # self.requires("doxygen/1.9.4")
-
         self.requires("openexr/3.1.9")
         self.requires("imath/3.1.9")
 
@@ -101,11 +104,6 @@ class OpenColorIOConan(ConanFile):
 
         if Version(self.version) >= "2.2.1" and self.options.shared and self.dependencies["minizip-ng"].options.shared:
             raise ConanInvalidConfiguration(f"{self.ref} requires static build minizip-ng")
-
-    def build_requirements(self):
-        if Version(self.version) >= "2.2.0":
-            if self.tool_requires is not None:
-                self.tool_requires("cmake/[>=3.16 <4]")
 
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)  # pylint: disable=no-member

@@ -26,6 +26,8 @@ class LibRawConan(ConanFile):
     default_options = {"shared": False, "fPIC": True, "with_jpeg": "libjpeg", "with_lcms": True, "with_jasper": False}
     exports_sources = ["CMakeLists.txt"]
 
+    tool_requires = "cmake/[>=3.16 <4]"
+
     @property
     def _min_cppstd(self):
         return 11

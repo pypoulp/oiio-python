@@ -28,6 +28,8 @@ class OpenImageIOConan(ConanFile):
 
     settings = "os", "arch", "compiler", "build_type"
 
+    tool_requires = "cmake/[>=3.16 <4]"
+
     options = {
         "shared": [True, False],
         "fPIC": [True, False],

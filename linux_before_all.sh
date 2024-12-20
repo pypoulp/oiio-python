@@ -23,7 +23,7 @@ install_musllinux() {
 
 # Detect the environment: Check for presence of apk or yum
 if command -v apk >/dev/null 2>&1; then
-    echo "Detected musl-linux environment (like Alpine)"
+    echo "Detected musl-linux environment"
     install_musllinux
 elif command -v yum >/dev/null 2>&1; then
     echo "Detected manylinux environment"

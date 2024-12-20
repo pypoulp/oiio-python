@@ -7,26 +7,36 @@ requires = [
   "numpy>=1.21.2,<2.0.0",
 ]
 
+# =======================[ CIBUILDWHEEL ]======================
+
 [tool.cibuildwheel]
 build-frontend = "build"
+skip = [
+  "pp*", # Disable building PyPy wheels on all platforms
+  "*-win32", # Skip 32-bit builds
+  "*-manylinux_i686", # Skip 32-bit builds
+]
 test-command = "python {project}/test.py"
 
 [tool.cibuildwheel.macos]
-archs = ["auto64"]
+before-all = [
+  "brew install cmake",
+]
+
+repair-wheel-command = [
+  "export REPAIR_LIBRARY=$PWD/oiio_python/libs:$DYLD_LIBRARY_PATH",
+  "DYLD_LIBRARY_PATH=$REPAIR_LIBRARY delocate-wheel -w {dest_dir} -v {wheel} -e \"$HOME/.conan2\"",
+]
 
 [tool.cibuildwheel.linux]
-archs = ["auto64"]
 before-all = [
   "chmod +x {project}/linux_before_all.sh",
   "bash {project}/linux_before_all.sh",
 ]
 repair-wheel-command = [
-  "export LD_LIBRARY_PATH=/project/oiio_python/libs:$LD_LIBRARY_PATH",
+  "export LD_LIBRARY_PATH=$PWD/oiio_python/libs:$LD_LIBRARY_PATH",
   "auditwheel repair -w {dest_dir} {wheel}",
 ]
-
-[tool.cibuildwheel.windows]
-archs = ["auto64"]
 
 # ===========================[ BLACK ]========================
 

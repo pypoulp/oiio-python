@@ -44,7 +44,7 @@ def conan_install_package(
     build_arg_list = []
     if platform.system() == "Linux":
         # Build everything on Linux to maximize compatibility on ManyLinux
-        build_arg_list.append("--build=*")
+        build_arg_list.append("--build=missing")
     else:
         for b in to_build:
             build_arg = f"--build={b}"
@@ -95,7 +95,6 @@ def build_packages(static_build: bool = False) -> None:
     os.environ["OIIO_PKG_DIR"] = oiio_pkg_dir.as_posix()
     os.environ["OIIO_LIBS_DIR"] = libs_dir.as_posix()
 
-    # How to set profile based on CIBW_ARCHS_WINDOWS env var ? especially to allow 32bit version on windows
     subprocess.run(["conan", "profile", "detect", "--force"], check=True)
     profile_name = "default"
 
@@ -126,14 +125,23 @@ def build_packages(static_build: bool = False) -> None:
     if (ocio_pkg_dir / "__init__.py").exists():
         os.remove(ocio_pkg_dir / "__init__.py")
 
-    shutil.copyfile(loaders_dir / "ocio_loader.py", ocio_pkg_dir / "__init__.py")
-    shutil.copyfile(loaders_dir / "oiio_loader.py", oiio_pkg_dir / "__init__.py")
+    # Copy loaders
+    if platform.system() == "Windows":
+        shutil.copyfile(loaders_dir / "ocio_loader_win.py", ocio_pkg_dir / "__init__.py")
+        shutil.copyfile(loaders_dir / "oiio_loader_win.py", oiio_pkg_dir / "__init__.py")
+    else:
+        shutil.copyfile(loaders_dir / "ocio_loader.py", ocio_pkg_dir / "loaders.py")
+        shutil.copyfile(loaders_dir / "oiio_loader.py", oiio_pkg_dir / "loaders.py")
 
     if not static_build:
         # Copy tool wrappers
         wrappers_dir = here / "oiio_python" / "tool_wrappers"
-        shutil.copyfile(wrappers_dir / "oiio_tools.py", oiio_pkg_dir / "_tool_wrapper.py")
-        shutil.copyfile(wrappers_dir / "ocio_tools.py", ocio_pkg_dir / "_tool_wrapper.py")
+        if platform.system() == "Windows":
+            shutil.copyfile(wrappers_dir / "oiio_tools_win.py", oiio_pkg_dir / "_tool_wrapper.py")
+            shutil.copyfile(wrappers_dir / "ocio_tools_win.py", ocio_pkg_dir / "_tool_wrapper.py")
+        else:
+            shutil.copyfile(wrappers_dir / "oiio_tools.py", oiio_pkg_dir / "_tool_wrapper.py")
+            shutil.copyfile(wrappers_dir / "ocio_tools.py", ocio_pkg_dir / "_tool_wrapper.py")
 
     # Clean build dirs
     shutil.rmtree(oiio_dir / "build")
@@ -181,10 +189,31 @@ if __name__ == "__main__":
         conan_profile_ensure()
         build_packages(static_build)
 
-        package_data = {
-            "OpenImageIO": ["*.*", "tools/*.*", "licenses/*.*"],
-            "PyOpenColorIO": ["*.*", "tools/*.*", "licenses/*.*"],
-        }
+        # Fix shared libraries on macos
+        if not static_build and platform.system() == "Darwin":
+            cmd = [sys.executable, (here / "macos_fix_shared_libs.py").as_posix()]
+            subprocess.run(cmd, check=True)
+
+        if static_build:
+            # Cleanup tools directories if needed
+            tool_dirs = [
+                here / "oiio_python" / "OpenImageIO" / "tools",
+                here / "oiio_python" / "PyOpenColorIO" / "tools",
+            ]
+
+            for tool_dir in tool_dirs:
+                if tool_dir.exists():
+                    shutil.rmtree(tool_dir)
+
+            package_data = {
+                "OpenImageIO": ["*.*", "licenses/*.*"],
+                "PyOpenColorIO": ["*.*", "licenses/*.*"],
+            }
+        else:
+            package_data = {
+                "OpenImageIO": ["*.*", "tools/*.*", "licenses/*.*"],
+                "PyOpenColorIO": ["*.*", "tools/*.*", "licenses/*.*"],
+            }
 
         include_data = True
         zip_safe = False
@@ -224,7 +253,7 @@ if __name__ == "__main__":
         zip_safe=zip_safe,  # Required for including DLLs and PYDs in wheel
         long_description_content_type="text/markdown",
         description="Unofficial OpenImageIO Python wheels, including OpenColorIO",
-        author="poulp",
+        author="Paul Parneix",
         author_email="thepoulp@pm.me",
         url="https://github.com/pypoulp/oiio-python",
         classifiers=[
