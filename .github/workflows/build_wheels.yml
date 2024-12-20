@@ -15,6 +15,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Python 3.8 on macOS arm64
+        if: runner.os == 'macOS' && runner.arch == 'ARM64'
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.8
+
       - name: Set MACOSX_DEPLOYMENT_TARGET for macOS x86_64
         if: runner.os == 'macOS' && matrix.os == 'macos-13'
         run: echo "MACOSX_DEPLOYMENT_TARGET=10.13" >> $GITHUB_ENV
