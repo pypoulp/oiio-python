@@ -192,6 +192,39 @@ class BinaryDistribution(Distribution):
         return True
 
 
+def debug_repair_library() -> None:
+    """
+    Print the contents of the REPAIR_LIBRARY directory and their architectures.
+    """
+    libs_dir = Path(os.getenv("OIIO_LIBS_DIR", "$PWD/oiio_python/libs"))
+    print("$PWD", os.getenv("$PWD"))
+    print("OIIO_LIBS_DIR", os.getenv("OIIO_LIBS_DIR"))
+
+    print("\n" + "=" * 80)
+    print("DEBUG: Inspecting libraries in REPAIR_LIBRARY:")
+    if not libs_dir.exists():
+        print(f"ERROR: REPAIR_LIBRARY path does not exist: {libs_dir}")
+        print("=" * 80 + "\n")
+        return
+
+    for lib_path in libs_dir.glob("*"):
+        print(f"Inspecting: {lib_path}")
+        if lib_path.is_file():
+            try:
+                result = subprocess.run(
+                    ["lipo", "-info", str(lib_path)],
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                )
+                print(f"  -> Architecture(s): {result.stdout.strip()}")
+            except subprocess.CalledProcessError as e:
+                print(f"  -> ERROR inspecting {lib_path}: {e.stderr.strip()}")
+        else:
+            print(f"  -> Skipping non-file: {lib_path}")
+    print("=" * 80 + "\n")
+
+
 if __name__ == "__main__":
 
     static_build = os.getenv("OIIO_STATIC") == "1"
@@ -206,6 +239,9 @@ if __name__ == "__main__":
     if "bdist_wheel" in sys.argv:
         conan_profile_ensure()
         build_packages(static_build)
+
+        if platform.system() == "Darwin":
+            debug_repair_library()
 
         # Fix shared libraries on macos
         if not static_build and platform.system() == "Darwin":
