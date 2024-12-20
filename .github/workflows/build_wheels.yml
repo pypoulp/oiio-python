@@ -43,6 +43,7 @@ jobs:
         env:
           MACOSX_DEPLOYMENT_TARGET: ${{ env.MACOSX_DEPLOYMENT_TARGET }}
           CIBW_PLATFORM: ${{ env.CIBW_PLATFORM }}
+          PROJECT_ROOT: ${{ github.workspace }}
         with:
           output-dir: wheelhouse
 
