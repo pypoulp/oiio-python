@@ -33,18 +33,14 @@ jobs:
       - name: Force ARM build on macOS 14
         if: runner.os == 'macOS' && matrix.os == 'macos-14'
         run: |
-          echo "CFLAGS=-arch arm64" >> $GITHUB_ENV
-          echo "LDFLAGS=-arch arm64" >> $GITHUB_ENV
-          echo "ARCHFLAGS=-arch arm64" >> $GITHUB_ENV
           echo "CIBW_ARCHS_MACOS=arm64" >> $GITHUB_ENV
+          echo "CIBW_PLATFORM=macos" >> $GITHUB_ENV
 
       - name: Set environment for Intel builds on macOS 13
         if: runner.os == 'macOS' && matrix.os == 'macos-13'
         run: |
-          echo "CFLAGS=-arch x86_64" >> $GITHUB_ENV
-          echo "LDFLAGS=-arch x86_64" >> $GITHUB_ENV
-          echo "ARCHFLAGS=-arch x86_64" >> $GITHUB_ENV
           echo "CIBW_ARCHS_MACOS=x86_64" >> $GITHUB_ENV
+          echo "CIBW_PLATFORM=macos" >> $GITHUB_ENV
 
       - name: Set CIBW_PLATFORM for Windows
         if: runner.os == 'Windows'
@@ -55,9 +51,6 @@ jobs:
         env:
           MACOSX_DEPLOYMENT_TARGET: ${{ env.MACOSX_DEPLOYMENT_TARGET }}
           CIBW_PLATFORM: ${{ env.CIBW_PLATFORM }}
-          CFLAGS: ${{ env.CFLAGS || null }}
-          LDFLAGS: ${{ env.LDFLAGS || null }}
-          ARCHFLAGS: ${{ env.ARCHFLAGS || null }}
           CIBW_ARCHS_MACOS: ${{ env.CIBW_ARCHS_MACOS || null }}
         with:
           output-dir: wheelhouse
