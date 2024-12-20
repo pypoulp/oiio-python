@@ -39,7 +39,13 @@ def conan_profile_ensure() -> None:
             print("Error detecting Conan profile:", detect_output.stderr)
     else:
         print("Default Conan profile already exists.")
-
+    
+    print("\n--- Conan Profile Details ---\n")
+    profile_show_output = subprocess.run(
+        ["conan", "profile", "show", "default"], capture_output=True, text=True, check=True
+    )
+    print(profile_show_output.stdout)
+    print("\n--- End of Profile Details ---\n")
 
 def conan_install_package(
     root_folder: Path,
