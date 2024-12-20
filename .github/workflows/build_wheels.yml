@@ -46,10 +46,10 @@ jobs:
         env:
           MACOSX_DEPLOYMENT_TARGET: ${{ env.MACOSX_DEPLOYMENT_TARGET }}
           CIBW_PLATFORM: ${{ env.CIBW_PLATFORM }}
-          CFLAGS: ${{ env.CFLAGS }}
-          LDFLAGS: ${{ env.LDFLAGS }}
-          ARCHFLAGS: ${{ env.ARCHFLAGS }}
-          CIBW_ARCHS_MACOS: ${{ env.CIBW_ARCHS_MACOS }}
+          CFLAGS: ${{ env.CFLAGS || null }}
+          LDFLAGS: ${{ env.LDFLAGS || null }}
+          ARCHFLAGS: ${{ env.ARCHFLAGS || null }}
+          CIBW_ARCHS_MACOS: ${{ env.CIBW_ARCHS_MACOS || null }}
         with:
           package-dir: .
           output-dir: wheelhouse
