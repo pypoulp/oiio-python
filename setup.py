@@ -42,7 +42,7 @@ def conan_profile_ensure() -> None:
     
     print("\n--- Conan Profile Details ---\n")
     profile_show_output = subprocess.run(
-        ["conan", "profile", "show", "default"], capture_output=True, text=True, check=True
+        ["conan", "profile", "show"], capture_output=True, text=True, check=True
     )
     print(profile_show_output.stdout)
     print("\n--- End of Profile Details ---\n")
