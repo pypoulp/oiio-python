@@ -238,6 +238,7 @@ def print_directory_tree(startpath, max_level=None):
         startpath (str): The root directory to print the tree for.
         max_level (int, optional): Maximum depth of the tree to display. Defaults to None (no limit).
     """
+    startpath = str(startpath)
     for root, dirs, files in os.walk(startpath):
         # Calculate the depth of the current directory
         level = root.replace(startpath, "").count(os.sep)
