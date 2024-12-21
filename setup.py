@@ -35,7 +35,9 @@ def conan_profile_ensure() -> None:
             detect_command = ["conan", "profile", "detect", "--force"]
 
         # Run 'conan profile detect'
-        detect_output = subprocess.run(detect_command, capture_output=True, text=True, check=True)
+        detect_output = subprocess.run(
+            detect_command, capture_output=True, text=True, check=True
+        )
         if detect_output.returncode == 0:
             print("Conan Profile detected successfully.")
         else:
@@ -44,7 +46,9 @@ def conan_profile_ensure() -> None:
         print("Default Conan profile already exists.")
 
     print("\n--- Conan Profile Details ---\n")
-    profile_show_output = subprocess.run(["conan", "profile", "show"], capture_output=True, text=True, check=True)
+    profile_show_output = subprocess.run(
+        ["conan", "profile", "show"], capture_output=True, text=True, check=True
+    )
     print(profile_show_output.stdout)
     print("\n--- End of Profile Details ---\n")
 
@@ -73,9 +77,18 @@ def conan_install_package(
         # Build everything on Linux to maximize compatibility on ManyLinux.
         # when using --build=*, conan rebuilds everything even if found in local cache. This is not ideal.
         # Lets use a lockfile to avoid rebuilding everything. after the first build.
-        if (here / "linux_conan.check").exists() and os.getenv("CIBUILDWHEEL") == "1":
-            build_arg_list.append("--no-remote")
-            build_arg_list.append("--build=missing")
+        check_file_path = here / "linux_conan.check"
+        if check_file_path.exists() and os.getenv("CIBUILDWHEEL") == "1":
+            auditwheel_policy = os.getenv("AUDITWHEEL_POLICY")
+            with open(check_file_path, "r", encoding="utf8") as f:
+                check_policy = f.read().strip()
+
+            if check_policy == auditwheel_policy:
+                print("Using lockfile to avoid rebuilding everything.")
+                build_arg_list.append("--no-remote")
+                build_arg_list.append("--build=missing")
+            else:
+                build_arg_list.append("--build=*")
         else:
             build_arg_list.append("--build=*")
     else:
@@ -177,8 +190,12 @@ def build_packages(static_build: bool = False) -> None:
 
     # Copy loaders
     if platform.system() == "Windows":
-        shutil.copyfile(loaders_dir / "ocio_loader_win.py", ocio_pkg_dir / "__init__.py")
-        shutil.copyfile(loaders_dir / "oiio_loader_win.py", oiio_pkg_dir / "__init__.py")
+        shutil.copyfile(
+            loaders_dir / "ocio_loader_win.py", ocio_pkg_dir / "__init__.py"
+        )
+        shutil.copyfile(
+            loaders_dir / "oiio_loader_win.py", oiio_pkg_dir / "__init__.py"
+        )
     else:
         shutil.copyfile(loaders_dir / "ocio_loader.py", ocio_pkg_dir / "__init__.py")
         shutil.copyfile(loaders_dir / "oiio_loader.py", oiio_pkg_dir / "__init__.py")
@@ -187,11 +204,19 @@ def build_packages(static_build: bool = False) -> None:
         # Copy tool wrappers
         wrappers_dir = here / "oiio_python" / "tool_wrappers"
         if platform.system() == "Windows":
-            shutil.copyfile(wrappers_dir / "oiio_tools_win.py", oiio_pkg_dir / "_tool_wrapper.py")
-            shutil.copyfile(wrappers_dir / "ocio_tools_win.py", ocio_pkg_dir / "_tool_wrapper.py")
+            shutil.copyfile(
+                wrappers_dir / "oiio_tools_win.py", oiio_pkg_dir / "_tool_wrapper.py"
+            )
+            shutil.copyfile(
+                wrappers_dir / "ocio_tools_win.py", ocio_pkg_dir / "_tool_wrapper.py"
+            )
         else:
-            shutil.copyfile(wrappers_dir / "oiio_tools.py", oiio_pkg_dir / "_tool_wrapper.py")
-            shutil.copyfile(wrappers_dir / "ocio_tools.py", ocio_pkg_dir / "_tool_wrapper.py")
+            shutil.copyfile(
+                wrappers_dir / "oiio_tools.py", oiio_pkg_dir / "_tool_wrapper.py"
+            )
+            shutil.copyfile(
+                wrappers_dir / "ocio_tools.py", ocio_pkg_dir / "_tool_wrapper.py"
+            )
 
     # Clean build dirs
     shutil.rmtree(oiio_dir / "build")
@@ -211,9 +236,9 @@ def build_packages(static_build: bool = False) -> None:
     # on same environment.
 
     if platform.system() == "Linux" and os.getenv("CIBUILDWHEEL") == "1":
-        if not (here / "linux_conan.check").exists():
-            with open(here / "linux_conan.check", "w", encoding="utf8") as f:
-                f.write("1")
+        auditwheel_policy = os.getenv("AUDITWHEEL_POLICY")
+        with open(here / "linux_conan.check", "w", encoding="utf8") as f:
+            f.write(str(auditwheel_policy))
 
 
 class BinaryDistribution(Distribution):
@@ -225,6 +250,11 @@ if __name__ == "__main__":
 
     oiio_static = os.getenv("OIIO_STATIC")
     static_build = str(oiio_static) == "1"
+
+    import json
+
+    env_vars = dict(os.environ)
+    print(json.dumps(env_vars, indent=4))
 
     print("=" * 80)
     print(f"OIIO_STATIC raw value: '{oiio_static}'")

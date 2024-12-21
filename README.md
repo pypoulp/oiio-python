@@ -52,12 +52,12 @@ This project builds two variants of the OpenImageIO Python bindings:
 
 - **`oiio-python`**: 
   - Links against shared OpenImageIO and OpenColorIO libraries.
-  - Smaller wheel size.
+  - Generally smaller wheel size.
   - Includes tools like `oiiotool` and `ociobakelut`.
 
 - **`oiio-static-python`**:
   - Uses statically linked dependencies.
-  - Larger wheel size.
+  - Generally larger wheel size.
   - Does **not** include OpenImageIO and OpenColorIO tools.
   - **Ideal for avoiding DLL conflicts**, especially when using Python embeded in applications like DCC tools that already use OpenImageIO.
 
@@ -163,6 +163,8 @@ Although the primary target is automated builds on GitHub Actions, you can also 
 🚧 **Work in Progress**: This project is under active development. Contributions and feedback are welcome!
 
 **Notes**
+ - A Github Action exist to build on Linux aarch64 using QEMU emulation, but it's way too slow and reach timeout. Current aarch64 wheels are built locally on a Raspberry Pi 5.
+
  - I'm not an expert in Conan, CMake, or Cibuildwheel. Feedback and suggestions for improvement are highly appreciated.
 
  - Optimizing the build process to avoid rebuilding LibOpenImageIO for each Python version is a potential area for improvement.

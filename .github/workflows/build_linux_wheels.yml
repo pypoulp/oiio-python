@@ -19,7 +19,7 @@ jobs:
         env:
           CIBW_ENVIRONMENT_PASS_LINUX: OIIO_STATIC CIBUILDWHEEL
           OIIO_STATIC: ${{ matrix.linking == 'static' && '1' || '0' }}
-          CIBW_BUILD: ${{ matrix.distrib == 'manylinux' && '*manylinux*' || '*musllinux*' }}
+          CIBW_BUILD: ${{ matrix.distrib == 'manylinux' && '*manylinux_x86*' || '*musllinux_x86*' }}
 
         with:
           output-dir: wheelhouse
