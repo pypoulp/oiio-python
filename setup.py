@@ -1,3 +1,5 @@
+# pylint: disable=missing-module-docstring,missing-function-docstring,missing-class-docstring,invalid-name
+
 import os
 import platform
 import shutil
@@ -35,7 +37,9 @@ def conan_profile_ensure() -> None:
             detect_command = ["conan", "profile", "detect", "--force"]
 
         # Run 'conan profile detect'
-        detect_output = subprocess.run(detect_command, capture_output=True, text=True, check=True)
+        detect_output = subprocess.run(
+            detect_command, capture_output=True, text=True, check=True
+        )
         if detect_output.returncode == 0:
             print("Conan Profile detected successfully.")
         else:
@@ -44,7 +48,9 @@ def conan_profile_ensure() -> None:
         print("Default Conan profile already exists.")
 
     print("\n--- Conan Profile Details ---\n")
-    profile_show_output = subprocess.run(["conan", "profile", "show"], capture_output=True, text=True, check=True)
+    profile_show_output = subprocess.run(
+        ["conan", "profile", "show"], capture_output=True, text=True, check=True
+    )
     print(profile_show_output.stdout)
     print("\n--- End of Profile Details ---\n")
 
@@ -136,7 +142,7 @@ def is_executable(file_path: Path):
     return file_path.is_file() and os.access(file_path, os.X_OK)
 
 
-def build_packages(static_build: bool = False) -> None:
+def build_packages(build_static_version: bool = False) -> None:
     ocio_pkg_dir = here / "oiio_python" / "PyOpenColorIO"
     oiio_pkg_dir = here / "oiio_python" / "OpenImageIO"
 
@@ -186,21 +192,33 @@ def build_packages(static_build: bool = False) -> None:
 
     # Copy loaders
     if platform.system() == "Windows":
-        shutil.copyfile(loaders_dir / "ocio_loader_win.py", ocio_pkg_dir / "__init__.py")
-        shutil.copyfile(loaders_dir / "oiio_loader_win.py", oiio_pkg_dir / "__init__.py")
+        shutil.copyfile(
+            loaders_dir / "ocio_loader_win.py", ocio_pkg_dir / "__init__.py"
+        )
+        shutil.copyfile(
+            loaders_dir / "oiio_loader_win.py", oiio_pkg_dir / "__init__.py"
+        )
     else:
         shutil.copyfile(loaders_dir / "ocio_loader.py", ocio_pkg_dir / "__init__.py")
         shutil.copyfile(loaders_dir / "oiio_loader.py", oiio_pkg_dir / "__init__.py")
 
-    if not static_build:
+    if not build_static_version:
         # Copy tool wrappers
         wrappers_dir = here / "oiio_python" / "tool_wrappers"
         if platform.system() == "Windows":
-            shutil.copyfile(wrappers_dir / "oiio_tools_win.py", oiio_pkg_dir / "_tool_wrapper.py")
-            shutil.copyfile(wrappers_dir / "ocio_tools_win.py", ocio_pkg_dir / "_tool_wrapper.py")
+            shutil.copyfile(
+                wrappers_dir / "oiio_tools_win.py", oiio_pkg_dir / "_tool_wrapper.py"
+            )
+            shutil.copyfile(
+                wrappers_dir / "ocio_tools_win.py", ocio_pkg_dir / "_tool_wrapper.py"
+            )
         else:
-            shutil.copyfile(wrappers_dir / "oiio_tools.py", oiio_pkg_dir / "_tool_wrapper.py")
-            shutil.copyfile(wrappers_dir / "ocio_tools.py", ocio_pkg_dir / "_tool_wrapper.py")
+            shutil.copyfile(
+                wrappers_dir / "oiio_tools.py", oiio_pkg_dir / "_tool_wrapper.py"
+            )
+            shutil.copyfile(
+                wrappers_dir / "ocio_tools.py", ocio_pkg_dir / "_tool_wrapper.py"
+            )
 
     # Clean build dirs
     shutil.rmtree(oiio_dir / "build")

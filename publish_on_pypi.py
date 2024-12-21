@@ -4,8 +4,8 @@ and publishing the package to PyPI or Test PyPI. It provides a simple CLI interf
 release and test modes.
 """
 
-import os
 import argparse
+import os
 import shutil
 import subprocess
 import sys
