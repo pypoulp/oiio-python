@@ -1,3 +1,5 @@
+# pylint: disable=E1101,C0114,C0115,C0116
+
 import os
 import sys
 from pathlib import Path
@@ -6,7 +8,14 @@ from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.build import check_min_cppstd
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
-from conan.tools.files import apply_conandata_patches, copy, export_conandata_patches, get, rm, rmdir
+from conan.tools.files import (
+    apply_conandata_patches,
+    copy,
+    export_conandata_patches,
+    get,
+    rm,
+    rmdir,
+)
 from conan.tools.microsoft import is_msvc, is_msvc_static_runtime
 from conan.tools.scm import Version
 
@@ -143,7 +152,9 @@ class OpenImageIOConan(ConanFile):
         if self.settings.compiler.cppstd:  # pylint: disable=no-member
             check_min_cppstd(self, 14)
         if is_msvc(self) and is_msvc_static_runtime(self) and self.options.shared:
-            raise ConanInvalidConfiguration("Building shared library with static runtime is not supported!")
+            raise ConanInvalidConfiguration(
+                "Building shared library with static runtime is not supported!"
+            )
 
     def layout(self):
         cmake_layout(self, src_folder="src")
@@ -157,7 +168,9 @@ class OpenImageIOConan(ConanFile):
         # CMake options
         tc.variables["Python_EXECUTABLE"] = Path(sys.executable).as_posix()
         tc.variables["USE_PYTHON"] = True
-        tc.variables["PYTHON_SITE_DIR"] = (Path(__file__).parents[2] / "OpenImageIO").as_posix()
+        tc.variables["PYTHON_SITE_DIR"] = (
+            Path(__file__).parents[2] / "OpenImageIO"
+        ).as_posix()
         tc.variables["CMAKE_DEBUG_POSTFIX"] = ""  # Needed for 2.3.x.x+ versions
         tc.variables["OIIO_BUILD_TOOLS"] = self.options.with_tools
         tc.variables["OIIO_BUILD_TESTS"] = False
@@ -175,7 +188,9 @@ class OpenImageIOConan(ConanFile):
 
         # OIIO CMake files are patched to check USE_* flags to require or not use dependencies
         tc.variables["USE_JPEGTURBO"] = self.options.with_libjpeg == "libjpeg-turbo"
-        tc.variables["USE_JPEG"] = True  # Needed for jpeg.imageio plugin, libjpeg/libjpeg-turbo selection still works
+        tc.variables["USE_JPEG"] = (
+            True  # Needed for jpeg.imageio plugin, libjpeg/libjpeg-turbo selection still works
+        )
         tc.variables["USE_HDF5"] = self.options.with_hdf5
         tc.variables["USE_OPENCOLORIO"] = self.options.with_opencolorio
         tc.variables["USE_OPENCV"] = self.options.with_opencv
@@ -222,7 +237,12 @@ class OpenImageIOConan(ConanFile):
         cmake.build()
 
     def package(self):
-        copy(self, "LICENSE*.md", src=self.source_folder, dst=os.path.join(self.package_folder, "licenses"))
+        copy(
+            self,
+            "LICENSE*.md",
+            src=self.source_folder,
+            dst=os.path.join(self.package_folder, "licenses"),
+        )
         cmake = CMake(self)
         cmake.install()
         rmdir(self, os.path.join(self.package_folder, "share"))

@@ -1,3 +1,5 @@
+# pylint: disable=E1101,C0114,C0115,C0116
+
 import os
 
 from conan import ConanFile

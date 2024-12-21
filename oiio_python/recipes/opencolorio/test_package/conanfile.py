@@ -1,8 +1,8 @@
 import os
 
-from conan import ConanFile
-from conan.tools.build import can_run
-from conan.tools.cmake import CMake, cmake_layout
+from conan import ConanFile  # type: ignore
+from conan.tools.build import can_run  # type: ignore
+from conan.tools.cmake import CMake, cmake_layout  # type: ignore
 
 
 class TestPackageConan(ConanFile):
@@ -10,7 +10,7 @@ class TestPackageConan(ConanFile):
     generators = "CMakeDeps", "CMakeToolchain", "VirtualRunEnv"
     test_type = "explicit"
     tool_requires = "cmake/[>=3.16 <4]"
-    
+
     def requirements(self):
         self.requires(self.tested_reference_str)
 

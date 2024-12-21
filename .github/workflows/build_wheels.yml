@@ -1,4 +1,4 @@
-name: Build
+name: Build Multiplatform Wheels
 
 on:
   workflow_dispatch:
@@ -15,6 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # By default, Python 3.8 is not ARM64 compatible on macOS
       - name: Set up Python 3.8 on macOS arm64
         if: runner.os == 'macOS' && matrix.os == 'macos-14'
         uses: actions/setup-python@v5
@@ -45,19 +46,6 @@ jobs:
           PROJECT_ROOT: ${{ github.workspace }}
         with:
           output-dir: wheelhouse
-
-      - name: Debug REPAIR_LIBRARY
-        run: |
-          echo "Contents of REPAIR_LIBRARY:"
-          for file in $PWD/oiio_python/libs/*; do
-            echo "Inspecting $file"
-            archs=$(lipo -info "$file" 2>/dev/null | grep -oE "arm64|x86_64" | tr '\n' ' ')
-            if [[ -z "$archs" ]]; then
-              echo "  -> Architecture: UNKNOWN or not a valid binary"
-            else
-              echo "  -> Architecture(s): $archs"
-            fi
-          done
 
       - uses: actions/upload-artifact@v4
         with:

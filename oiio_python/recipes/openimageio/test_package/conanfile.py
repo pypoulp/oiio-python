@@ -1,8 +1,9 @@
+# pylint: disable=E1101,C0114,C0115,C0116
 import os
 
 from conan import ConanFile
-from conan.tools.build import can_run
-from conan.tools.cmake import CMake, cmake_layout
+from conan.tools.build import can_run  # type: ignore
+from conan.tools.cmake import CMake, cmake_layout  # type: ignore
 
 
 class TestPackageConan(ConanFile):

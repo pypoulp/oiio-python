@@ -37,35 +37,3 @@ repair-wheel-command = [
   "export LD_LIBRARY_PATH=/project/oiio_python/libs:$LD_LIBRARY_PATH",
   "auditwheel repair -w {dest_dir} {wheel}",
 ]
-
-# ===========================[ BLACK ]========================
-
-[tool.black]
-line_length = 120
-
-# ===========================[ ISORT ]========================
-
-[tool.isort]
-line_length = 120
-profile = "black"
-
-# ===========================[ PYLINT ]========================
-
-[tool.pylint.FORMAT]
-max-line-length = 120
-
-[tool.pylint.'MESSAGES CONTROL']
-disable = [
-  'missing-module-docstring',
-  'missing-class-docstring',
-  'missing-function-docstring',
-  'line-too-long',
-  'too-many-locals',
-  'too-many-instance-attributes',
-  'too-many-positional-arguments',
-  'too-many-arguments',
-  'too-few-public-methods',
-  'too-many-branches',
-  'duplicate-code',
-  'fixme',
-]

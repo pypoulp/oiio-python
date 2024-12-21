@@ -1,3 +1,4 @@
+# pylint: disable=E1101,C0114,C0115,C0116
 import os
 
 from conan import ConanFile
@@ -23,7 +24,13 @@ class LibRawConan(ConanFile):
         "with_lcms": [True, False],
         "with_jasper": [True, False],
     }
-    default_options = {"shared": False, "fPIC": True, "with_jpeg": "libjpeg", "with_lcms": True, "with_jasper": False}
+    default_options = {
+        "shared": False,
+        "fPIC": True,
+        "with_jpeg": "libjpeg",
+        "with_lcms": True,
+        "with_jasper": False,
+    }
     exports_sources = ["CMakeLists.txt"]
 
     tool_requires = "cmake/[>=3.16 <4]"
@@ -82,8 +89,18 @@ class LibRawConan(ConanFile):
         cmake.build()
 
     def package(self):
-        copy(self, pattern="LICENSE*", dst=os.path.join(self.package_folder, "licenses"), src=self.source_folder)
-        copy(self, pattern="COPYRIGHT", dst=os.path.join(self.package_folder, "licenses"), src=self.source_folder)
+        copy(
+            self,
+            pattern="LICENSE*",
+            dst=os.path.join(self.package_folder, "licenses"),
+            src=self.source_folder,
+        )
+        copy(
+            self,
+            pattern="COPYRIGHT",
+            dst=os.path.join(self.package_folder, "licenses"),
+            src=self.source_folder,
+        )
         cmake = CMake(self)
         cmake.install()
 

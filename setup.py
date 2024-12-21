@@ -14,7 +14,10 @@ here = Path(__file__).parent.resolve()
 def conan_profile_ensure() -> None:
     # Check if the default profile exists by listing profiles
     list_profiles_output = subprocess.run(
-        ["conan", "profile", "list", "--path"], capture_output=True, text=True, check=True
+        ["conan", "profile", "list", "--path"],
+        capture_output=True,
+        text=True,
+        check=True,
     )
     profiles = list_profiles_output.stdout.strip().splitlines()
     if "default" not in profiles:
@@ -32,7 +35,9 @@ def conan_profile_ensure() -> None:
             detect_command = ["conan", "profile", "detect", "--force"]
 
         # Run 'conan profile detect'
-        detect_output = subprocess.run(detect_command, capture_output=True, text=True, check=True)
+        detect_output = subprocess.run(
+            detect_command, capture_output=True, text=True, check=True
+        )
         if detect_output.returncode == 0:
             print("Conan Profile detected successfully.")
         else:
@@ -41,7 +46,9 @@ def conan_profile_ensure() -> None:
         print("Default Conan profile already exists.")
 
     print("\n--- Conan Profile Details ---\n")
-    profile_show_output = subprocess.run(["conan", "profile", "show"], capture_output=True, text=True, check=True)
+    profile_show_output = subprocess.run(
+        ["conan", "profile", "show"], capture_output=True, text=True, check=True
+    )
     print(profile_show_output.stdout)
     print("\n--- End of Profile Details ---\n")
 
@@ -55,7 +62,14 @@ def conan_install_package(
     to_build=None,
 ) -> None:
 
-    source_cmd = ["conan", "source", root_folder.as_posix(), "--version", version, "-vwarning"]
+    source_cmd = [
+        "conan",
+        "source",
+        root_folder.as_posix(),
+        "--version",
+        version,
+        "-vwarning",
+    ]
     if to_build is None:
         to_build = ["missing"]
     build_arg_list = []
@@ -86,8 +100,24 @@ def conan_install_package(
 
     install_cmd += build_arg_list
 
-    build_cmd = ["conan", "build", root_folder.as_posix(), "--version", version, "--profile", profile, "-vwarning"]
-    export_cmd = ["conan", "export-pkg", root_folder.as_posix(), "--version", version, "-vwarning"]
+    build_cmd = [
+        "conan",
+        "build",
+        root_folder.as_posix(),
+        "--version",
+        version,
+        "--profile",
+        profile,
+        "-vwarning",
+    ]
+    export_cmd = [
+        "conan",
+        "export-pkg",
+        root_folder.as_posix(),
+        "--version",
+        version,
+        "-vwarning",
+    ]
     if source:
         subprocess.run(source_cmd, check=True)
     subprocess.run(install_cmd, check=True)
@@ -151,8 +181,12 @@ def build_packages(static_build: bool = False) -> None:
 
     # Copy loaders
     if platform.system() == "Windows":
-        shutil.copyfile(loaders_dir / "ocio_loader_win.py", ocio_pkg_dir / "__init__.py")
-        shutil.copyfile(loaders_dir / "oiio_loader_win.py", oiio_pkg_dir / "__init__.py")
+        shutil.copyfile(
+            loaders_dir / "ocio_loader_win.py", ocio_pkg_dir / "__init__.py"
+        )
+        shutil.copyfile(
+            loaders_dir / "oiio_loader_win.py", oiio_pkg_dir / "__init__.py"
+        )
     else:
         shutil.copyfile(loaders_dir / "ocio_loader.py", ocio_pkg_dir / "__init__.py")
         shutil.copyfile(loaders_dir / "oiio_loader.py", oiio_pkg_dir / "__init__.py")
@@ -161,11 +195,19 @@ def build_packages(static_build: bool = False) -> None:
         # Copy tool wrappers
         wrappers_dir = here / "oiio_python" / "tool_wrappers"
         if platform.system() == "Windows":
-            shutil.copyfile(wrappers_dir / "oiio_tools_win.py", oiio_pkg_dir / "_tool_wrapper.py")
-            shutil.copyfile(wrappers_dir / "ocio_tools_win.py", ocio_pkg_dir / "_tool_wrapper.py")
+            shutil.copyfile(
+                wrappers_dir / "oiio_tools_win.py", oiio_pkg_dir / "_tool_wrapper.py"
+            )
+            shutil.copyfile(
+                wrappers_dir / "ocio_tools_win.py", ocio_pkg_dir / "_tool_wrapper.py"
+            )
         else:
-            shutil.copyfile(wrappers_dir / "oiio_tools.py", oiio_pkg_dir / "_tool_wrapper.py")
-            shutil.copyfile(wrappers_dir / "ocio_tools.py", ocio_pkg_dir / "_tool_wrapper.py")
+            shutil.copyfile(
+                wrappers_dir / "oiio_tools.py", oiio_pkg_dir / "_tool_wrapper.py"
+            )
+            shutil.copyfile(
+                wrappers_dir / "ocio_tools.py", ocio_pkg_dir / "_tool_wrapper.py"
+            )
 
     # Clean build dirs
     shutil.rmtree(oiio_dir / "build")
@@ -306,7 +348,7 @@ if __name__ == "__main__":
 
             for tool in oiio_tools:
                 scripts[tool] = f"OpenImageIO._tool_wrapper:{tool}"
-            
+
             for tool in ocio_tools:
                 scripts[tool] = f"PyOpenColorIO._tool_wrapper:{tool}"
 
