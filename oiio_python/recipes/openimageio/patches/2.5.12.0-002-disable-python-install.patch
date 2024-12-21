@@ -1,0 +1,25 @@
+--- src/cmake/pythonutils.cmake
++++ src/cmake/pythonutils.cmake
+@@ -49,10 +49,6 @@
+     set (PythonInterp_FIND_VERSION PYTHON_VERSION_FOUND)
+     set (PythonInterp_FIND_VERSION_MAJOR ${Python_VERSION_MAJOR})
+ 
+-    if (NOT DEFINED PYTHON_SITE_DIR)
+-        set (PYTHON_SITE_DIR "${CMAKE_INSTALL_LIBDIR}/python${PYTHON_VERSION_FOUND}/site-packages/OpenImageIO")
+-    endif ()
+-    message (VERBOSE "    Python site packages dir ${PYTHON_SITE_DIR}")
+     message (VERBOSE "    Python to include 'lib' prefix: ${PYLIB_LIB_PREFIX}")
+     message (VERBOSE "    Python to include SO version: ${PYLIB_INCLUDE_SONAME}")
+ endmacro()
+@@ -132,11 +128,4 @@
+             ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/python/site-packages
+             )
+ 
+-    install (TARGETS ${target_name}
+-             RUNTIME DESTINATION ${PYTHON_SITE_DIR} COMPONENT user
+-             LIBRARY DESTINATION ${PYTHON_SITE_DIR} COMPONENT user)
+-
+-    install(FILES __init__.py DESTINATION ${PYTHON_SITE_DIR})
+-
+ endmacro ()
+-

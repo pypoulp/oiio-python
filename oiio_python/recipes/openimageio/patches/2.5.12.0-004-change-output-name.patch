@@ -1,0 +1,22 @@
+--- src/libutil/CMakeLists.txt
++++ src/libutil/CMakeLists.txt
+@@ -49,7 +49,7 @@
+                       PROPERTIES
+                          VERSION     ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}
+                          SOVERSION   ${SOVERSION}
+-                         OUTPUT_NAME OpenImageIO_Util${OIIO_LIBNAME_SUFFIX}
++                         OUTPUT_NAME OpenImageIO_Util_2_5${OIIO_LIBNAME_SUFFIX}
+                          POSITION_INDEPENDENT_CODE ON
+                      )
+ 
+--- src/libOpenImageIO/CMakeLists.txt
++++ src/libOpenImageIO/CMakeLists.txt
+@@ -223,7 +223,7 @@
+                       PROPERTIES
+                          VERSION     ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}
+                          SOVERSION   ${SOVERSION}
+-                         OUTPUT_NAME OpenImageIO${OIIO_LIBNAME_SUFFIX}
++                         OUTPUT_NAME OpenImageIO_2_5${OIIO_LIBNAME_SUFFIX}
+                          POSITION_INDEPENDENT_CODE ON
+                         # UNITY_BUILD_BATCH_SIZE 4
+                      )

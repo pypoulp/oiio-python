@@ -1,0 +1,150 @@
+--- src/cmake/modules/FindLibRaw.cmake
++++ src/cmake/modules/FindLibRaw.cmake
+@@ -1,12 +1,12 @@
+-# - Find LibRaw
+-# Find the LibRaw library <http://www.libraw.org>
++# - Find libraw
++# Find the libraw library <http://www.libraw.org>
+ # This module defines
+-#  LibRaw_VERSION_STRING, the version string of LibRaw
+-#  LibRaw_INCLUDE_DIR, where to find libraw.h
+-#  LibRaw_LIBRARIES, the libraries needed to use LibRaw (non-thread-safe)
+-#  LibRaw_r_LIBRARIES, the libraries needed to use LibRaw (thread-safe)
+-#  LibRaw_DEFINITIONS, the definitions needed to use LibRaw (non-thread-safe)
+-#  LibRaw_r_DEFINITIONS, the definitions needed to use LibRaw (thread-safe)
++#  libraw_VERSION_STRING, the version string of libraw
++#  libraw_INCLUDE_DIR, where to find libraw.h
++#  libraw_LIBRARIES, the libraries needed to use libraw (non-thread-safe)
++#  libraw_r_LIBRARIES, the libraries needed to use libraw (thread-safe)
++#  libraw_DEFINITIONS, the definitions needed to use libraw (non-thread-safe)
++#  libraw_r_DEFINITIONS, the definitions needed to use libraw (thread-safe)
+ #
+ # Copyright (c) 2013, Pino Toscano <pino at kde dot org>
+ # Copyright (c) 2013, Gilles Caulier <caulier dot gilles at gmail dot com>
+@@ -16,29 +16,29 @@
+ 
+ find_package(PkgConfig)
+ 
+-if(PKG_CONFIG_FOUND AND NOT LibRaw_ROOT AND NOT $ENV{LibRaw_ROOT})
++if(PKG_CONFIG_FOUND AND NOT libraw_ROOT AND NOT $ENV{libraw_ROOT})
+    PKG_CHECK_MODULES(PC_LIBRAW QUIET libraw)
+-   SET(LibRaw_DEFINITIONS ${PC_LIBRAW_CFLAGS_OTHER})
++   SET(libraw_DEFINITIONS ${PC_LIBRAW_CFLAGS_OTHER})
+ 
+    PKG_CHECK_MODULES(PC_LIBRAW_R QUIET libraw_r)
+-   SET(LibRaw_r_DEFINITIONS ${PC_LIBRAW_R_CFLAGS_OTHER})
++   SET(libraw_r_DEFINITIONS ${PC_LIBRAW_R_CFLAGS_OTHER})
+ endif()
+ 
+-find_path(LibRaw_INCLUDE_DIR libraw/libraw.h
++find_path(libraw_INCLUDE_DIR libraw/libraw.h
+           HINTS
+           ${LIBRAW_INCLUDEDIR_HINT}
+           ${PC_LIBRAW_INCLUDEDIR}
+-          ${PC_LibRaw_INCLUDE_DIRS}
++          ${PC_libraw_INCLUDE_DIRS}
+           PATH_SUFFIXES libraw
+          )
+-find_library(LibRaw_LIBRARIES NAMES raw libraw
++find_library(libraw_LIBRARIES NAMES raw libraw
+              HINTS
+              ${LIBRAW_LIBDIR_HINT}
+              ${PC_LIBRAW_LIBDIR}
+              ${PC_LIBRAW_LIBRARY_DIRS}
+             )
+ 
+-find_library(LibRaw_r_LIBRARIES NAMES raw_r
++find_library(libraw_r_LIBRARIES NAMES raw_r
+              HINTS
+              ${LIBRAW_LIBDIR_HINT}
+              ${PC_LIBRAW_R_LIBDIR}
+@@ -46,11 +46,11 @@
+             )
+ 
+ if(WIN32)
+-   SET( LibRaw_r_LIBRARIES ${LibRaw_LIBRARIES} )
++   SET( libraw_r_LIBRARIES ${libraw_LIBRARIES} )
+ endif()
+ 
+-if(LibRaw_INCLUDE_DIR)
+-   FILE(READ ${LibRaw_INCLUDE_DIR}/libraw/libraw_version.h _libraw_version_content)
++if(libraw_INCLUDE_DIR)
++   FILE(READ ${libraw_INCLUDE_DIR}/libraw/libraw_version.h _libraw_version_content)
+    
+    STRING(REGEX MATCH "#define LIBRAW_MAJOR_VERSION[ \t]*([0-9]*)\n" _version_major_match ${_libraw_version_content})
+    SET(_libraw_version_major "${CMAKE_MATCH_1}")
+@@ -62,40 +62,40 @@
+    SET(_libraw_version_patch "${CMAKE_MATCH_1}")
+    
+    if(_version_major_match AND _version_minor_match AND _version_patch_match)
+-      SET(LibRaw_VERSION_STRING "${_libraw_version_major}.${_libraw_version_minor}.${_libraw_version_patch}")
++      SET(libraw_VERSION_STRING "${_libraw_version_major}.${_libraw_version_minor}.${_libraw_version_patch}")
+    else()
+-      if(NOT LibRaw_FIND_QUIETLY)
+-         MESSAGE(STATUS "Failed to get version information from ${LibRaw_INCLUDE_DIR}/libraw/libraw_version.h")
++      if(NOT libraw_FIND_QUIETLY)
++         MESSAGE(STATUS "Failed to get version information from ${libraw_INCLUDE_DIR}/libraw/libraw_version.h")
+       endif()
+    endif()
+ endif()
+ 
+ include(FindPackageHandleStandardArgs)
+-FIND_PACKAGE_HANDLE_STANDARD_ARGS(LibRaw
+-                                  REQUIRED_VARS LibRaw_LIBRARIES LibRaw_r_LIBRARIES LibRaw_INCLUDE_DIR
+-                                  VERSION_VAR LibRaw_VERSION_STRING
++FIND_PACKAGE_HANDLE_STANDARD_ARGS(libraw
++                                  REQUIRED_VARS libraw_LIBRARIES libraw_r_LIBRARIES libraw_INCLUDE_DIR
++                                  VERSION_VAR libraw_VERSION_STRING
+                                  )
+ 
+-MARK_AS_ADVANCED(LibRaw_VERSION_STRING
+-                 LibRaw_INCLUDE_DIR
+-                 LibRaw_LIBRARIES
+-                 LibRaw_r_LIBRARIES
+-                 LibRaw_DEFINITIONS
+-                 LibRaw_r_DEFINITIONS
++MARK_AS_ADVANCED(libraw_VERSION_STRING
++                 libraw_INCLUDE_DIR
++                 libraw_LIBRARIES
++                 libraw_r_LIBRARIES
++                 libraw_DEFINITIONS
++                 libraw_r_DEFINITIONS
+                  )
+ 
+ if (LINKSTATIC)
+     # Necessary?
+     find_package (Jasper)
+     if (JASPER_FOUND)
+-        set (LibRaw_r_LIBRARIES ${LibRaw_r_LIBRARIES} ${JASPER_LIBRARIES})
++        set (libraw_r_LIBRARIES ${libraw_r_LIBRARIES} ${JASPER_LIBRARIES})
+     endif()
+     find_library (LCMS2_LIBRARIES NAMES lcms2)
+     if (LCMS2_LIBRARIES)
+-        set (LibRaw_r_LIBRARIES ${LibRaw_r_LIBRARIES} ${LCMS2_LIBRARIES})
++        set (libraw_r_LIBRARIES ${libraw_r_LIBRARIES} ${LCMS2_LIBRARIES})
+     endif()
+     if (MSVC)
+-        set (LibRaw_r_DEFINITIONS ${LibRaw_r_DEFINITIONS} -DLIBRAW_NODLL)
+-        set (LibRaw_DEFINITIONS ${LibRaw_DEFINITIONS} -DLIBRAW_NODLL)
++        set (libraw_r_DEFINITIONS ${libraw_r_DEFINITIONS} -DLIBRAW_NODLL)
++        set (libraw_DEFINITIONS ${libraw_DEFINITIONS} -DLIBRAW_NODLL)
+     endif()
+ endif ()
+--- src/raw.imageio/CMakeLists.txt
++++ src/raw.imageio/CMakeLists.txt
+@@ -2,11 +2,11 @@
+ # SPDX-License-Identifier: Apache-2.0
+ # https://github.com/AcademySoftwareFoundation/OpenImageIO
+ 
+-if (LIBRAW_FOUND)
++if (libraw_FOUND)
+     add_oiio_plugin (rawinput.cpp
+-                     INCLUDE_DIRS ${LibRaw_INCLUDE_DIR}
+-                     LINK_LIBRARIES ${LibRaw_r_LIBRARIES}
+-                     DEFINITIONS "-DUSE_LIBRAW=1" ${LibRaw_r_DEFINITIONS})
++                     INCLUDE_DIRS ${libraw_INCLUDE_DIR}
++                     LINK_LIBRARIES libraw::libraw
++                     DEFINITIONS "-DUSE_LIBRAW=1" ${libraw_r_DEFINITIONS})
+ else ()
+     message (WARNING "Raw plugin will not be built")
+ endif ()

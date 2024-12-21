@@ -1,4 +1,4 @@
-name: Build
+name: Build Multiplatform Wheels
 
 on:
   workflow_dispatch:
@@ -15,22 +15,37 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # By default, Python 3.8 is not ARM64 compatible on macOS
+      - name: Set up Python 3.8 on macOS arm64
+        if: runner.os == 'macOS' && matrix.os == 'macos-14'
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.8
+
       - name: Set MACOSX_DEPLOYMENT_TARGET for macOS x86_64
         if: runner.os == 'macOS' && matrix.os == 'macos-13'
-        run: echo "MACOSX_DEPLOYMENT_TARGET=10.13" >> $GITHUB_ENV
+        run: |
+          echo "MACOSX_DEPLOYMENT_TARGET=10.13" >> $GITHUB_ENV
+          echo "CIBW_PLATFORM=macos" >> $GITHUB_ENV
 
       - name: Set MACOSX_DEPLOYMENT_TARGET for macOS arm64
         if: runner.os == 'macOS' && matrix.os == 'macos-14'
-        run: echo "MACOSX_DEPLOYMENT_TARGET=14.0" >> $GITHUB_ENV
+        run: |
+          echo "MACOSX_DEPLOYMENT_TARGET=14.0" >> $GITHUB_ENV
+          echo "CIBW_PLATFORM=macos" >> $GITHUB_ENV
+
+      - name: Set CIBW_PLATFORM for Windows
+        if: runner.os == 'Windows'
+        run: echo "CIBW_PLATFORM=windows" >> $GITHUB_ENV
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.22.0
         env:
           MACOSX_DEPLOYMENT_TARGET: ${{ env.MACOSX_DEPLOYMENT_TARGET }}
+          CIBW_PLATFORM: ${{ env.CIBW_PLATFORM }}
+          PROJECT_ROOT: ${{ github.workspace }}
         with:
-          package-dir: .
           output-dir: wheelhouse
-          config-file: "{package}/pyproject.toml"
 
       - uses: actions/upload-artifact@v4
         with:
