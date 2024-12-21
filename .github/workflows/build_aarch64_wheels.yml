@@ -17,15 +17,17 @@ jobs:
         with:
           platforms: aarch64
 
-      - name: Build  wheels
+      - name: Build static wheels
         uses: pypa/cibuildwheel@v2.22.0
         env:
           CIBW_ARCHS_LINUX: aarch64
           OIIO_STATIC: 1
+        with:
+          output-dir: wheelhouse
 
       - uses: actions/upload-artifact@v4
         with:
-          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          name: cibw-static-wheels-linux-aarch64
           path: ./wheelhouse/*.whl
   
   build_shared_wheels:
@@ -39,12 +41,14 @@ jobs:
         with:
           platforms: aarch64
 
-      - name: Build  wheels
+      - name: Build shared wheels
         uses: pypa/cibuildwheel@v2.22.0
         env:
           CIBW_ARCHS_LINUX: aarch64
+        with:
+          output-dir: wheelhouse
 
       - uses: actions/upload-artifact@v4
         with:
-          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          name: cibw-shared-wheels-linux-aarch64
           path: ./wheelhouse/*.whl
