@@ -289,10 +289,26 @@ if __name__ == "__main__":
         # Define scripts based on the build type
         scripts_list = []
         if not static_build:
-            scripts = {
-                "ocioarchive": "PyOpenColorIO._tool_wrapper:ocioarchive",
-                "oiiotool": "OpenImageIO._tool_wrapper:oiiotool",
-            }
+            oiio_tools = ["iconvert", "idiff", "igrep", "iinfo", "maketx", "oiiotool"]
+            ocio_tools = [
+                "ocioarchive",
+                "ociobakelut",
+                "ociocheck",
+                "ociochecklut",
+                "ocioconvert",
+                "ociolutimage",
+                "ociomakeclf",
+                "ocioperf",
+                "ociowrite",
+            ]
+
+            scripts = dict()
+
+            for tool in oiio_tools:
+                scripts[tool] = f"OpenImageIO._tool_wrapper:{tool}"
+            
+            for tool in ocio_tools:
+                scripts[tool] = f"PyOpenColorIO._tool_wrapper:{tool}"
 
             for script_name, script_path in scripts.items():
                 scripts_list.append(f"{script_name}={script_path}")
