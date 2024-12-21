@@ -5,13 +5,13 @@ on:
 
 jobs:
   build_wheels:
-    name: Build ${{ matrix.linking }} wheels on ${{ matrix.manylinux }}
+    name: Build ${{ matrix.linking }} wheels on ${{ matrix.distrib }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
         distrib: [manylinux, musllinux]
         linking: [dynamic, static]
-        
+
     steps:
       - uses: actions/checkout@v4
       - name: Build wheels
