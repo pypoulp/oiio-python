@@ -6,27 +6,25 @@ on:
 jobs:
   build_wheels:
     name: Build ${{ matrix.linking }} wheels on ${{ matrix.manylinux }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         distrib: [manylinux, musllinux]
         linking: [dynamic, static]
-        os: [ubuntu-latest]
-
+        
     steps:
       - uses: actions/checkout@v4
-
-
-
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.22.0
         env:
-          CIBW_PLATFORM: ${{ env.CIBW_PLATFORM }}
-          PROJECT_ROOT: ${{ github.workspace }}
+          CIBW_ENVIRONMENT_PASS_LINUX: OIIO_STATIC CIBUILDWHEEL
+          OIIO_STATIC: ${{ matrix.linking == 'static' && '1' || '0' }}
+          CIBW_BUILD: ${{ matrix.distrib == 'manylinux' && '*manylinux*' || '*musllinux*' }}
+
         with:
           output-dir: wheelhouse
 
       - uses: actions/upload-artifact@v4
         with:
-          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          name:  cibw-wheels-${{ matrix.distrib }}-${{ matrix.linking }}-${{ strategy.job-index }}
           path: ./wheelhouse/*.whl

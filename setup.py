@@ -73,7 +73,7 @@ def conan_install_package(
         # Build everything on Linux to maximize compatibility on ManyLinux.
         # when using --build=*, conan rebuilds everything even if found in local cache. This is not ideal.
         # Lets use a lockfile to avoid rebuilding everything. after the first build.
-        if (here / "linux_conan.check").exists():
+        if (here / "linux_conan.check").exists() and os.getenv("CIBUILDWHEEL") == "1":
             build_arg_list.append("--no-remote")
             build_arg_list.append("--build=missing")
         else:
@@ -210,51 +210,15 @@ def build_packages(static_build: bool = False) -> None:
     # Create a check file for Linux to avoid rebuilding everything on the next run
     # on same environment.
 
-    if platform.system() == "Linux":
+    if platform.system() == "Linux" and os.getenv("CIBUILDWHEEL") == "1":
         if not (here / "linux_conan.check").exists():
             with open(here / "linux_conan.check", "w", encoding="utf8") as f:
                 f.write("1")
 
 
-# if platform.system() == "Windows":
-#     lib_ext = ".dll"
-#     pylib_ext = ".pyd"
-# elif platform.system() == "Darwin":
-#     lib_ext = ".dylib"
-#     pylib_ext = ".so"
-# else:
-#     lib_ext = ".so"
-#     pylib_ext = ".so"
-
-
 class BinaryDistribution(Distribution):
     def has_ext_modules(self):
         return True
-
-
-def print_directory_tree(startpath, max_level=None):
-    """
-    Print the directory tree starting from `startpath`.
-
-    Args:
-        startpath (str): The root directory to print the tree for.
-        max_level (int, optional): Maximum depth of the tree to display. Defaults to None (no limit).
-    """
-    startpath = str(startpath)
-    for root, dirs, files in os.walk(startpath):
-        # Calculate the depth of the current directory
-        level = root.replace(startpath, "").count(os.sep)
-
-        # Limit depth if max_level is specified
-        if max_level is not None and level > max_level:
-            continue
-
-        indent = " " * 4 * level
-        print(f"{indent}[DIR] {os.path.basename(root)}/")
-
-        sub_indent = " " * 4 * (level + 1)
-        for f in files:
-            print(f"{sub_indent}[FILE] {f}")
 
 
 if __name__ == "__main__":

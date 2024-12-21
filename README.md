@@ -134,6 +134,7 @@ Although the primary target is automated builds on GitHub Actions, you can also 
 2. Install Docker and build:
 
     ```bash
+    export CIBW_ENVIRONMENT="OIIO_STATIC=1"  # For the static version
     python - m pip install cibuildwheel
     cibuildwheel
     ```
