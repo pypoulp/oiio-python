@@ -45,6 +45,7 @@ jobs:
           CIBW_PLATFORM: ${{ env.CIBW_PLATFORM }}
           PROJECT_ROOT: ${{ github.workspace }}
           OIIO_STATIC: 1
+          CIBW_ENVIRONMENT: OIIO_STATIC=1
         with:
           output-dir: wheelhouse
 
