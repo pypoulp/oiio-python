@@ -81,7 +81,7 @@ def publish_to_pypi(repository_url, static):
         print(f"Wheelhouse directory not found: {wheelhouse}")
         sys.exit(1)
 
-    wheel_files = list((here / "wheelhouse").glob("*.whl"))
+    wheel_files = list((here / wheelhouse).glob("*.whl"))
 
     print("=" * 80)
     print(
