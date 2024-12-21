@@ -2,7 +2,7 @@
 
 **OpenImageIO on wheels !**
 
-This project provides (unnoficial) multiplatform wheels for [OpenImageIO](https://github.com/AcademySoftwareFoundation/OpenImageIO) Python bindings, simplifying installation and integration into Python projects.
+This project provides (unofficial) multiplatform wheels for [OpenImageIO](https://github.com/AcademySoftwareFoundation/OpenImageIO) Python bindings, simplifying installation and integration into Python projects.
 
 ---
 
@@ -59,7 +59,7 @@ This project builds two variants of the OpenImageIO Python bindings:
   - Uses statically linked dependencies.
   - Larger wheel size.
   - Does **not** include OpenImageIO and OpenColorIO tools.
-  - **Ideal for avoiding DLL conflicts**, especially when embedding Python in applications like DCC tools that already use OpenImageIO.
+  - **Ideal for avoiding DLL conflicts**, especially when using Python embeded in applications like DCC tools that already use OpenImageIO.
 
 ---
 
