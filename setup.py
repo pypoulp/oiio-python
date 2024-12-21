@@ -35,9 +35,7 @@ def conan_profile_ensure() -> None:
             detect_command = ["conan", "profile", "detect", "--force"]
 
         # Run 'conan profile detect'
-        detect_output = subprocess.run(
-            detect_command, capture_output=True, text=True, check=True
-        )
+        detect_output = subprocess.run(detect_command, capture_output=True, text=True, check=True)
         if detect_output.returncode == 0:
             print("Conan Profile detected successfully.")
         else:
@@ -46,9 +44,7 @@ def conan_profile_ensure() -> None:
         print("Default Conan profile already exists.")
 
     print("\n--- Conan Profile Details ---\n")
-    profile_show_output = subprocess.run(
-        ["conan", "profile", "show"], capture_output=True, text=True, check=True
-    )
+    profile_show_output = subprocess.run(["conan", "profile", "show"], capture_output=True, text=True, check=True)
     print(profile_show_output.stdout)
     print("\n--- End of Profile Details ---\n")
 
@@ -181,12 +177,8 @@ def build_packages(static_build: bool = False) -> None:
 
     # Copy loaders
     if platform.system() == "Windows":
-        shutil.copyfile(
-            loaders_dir / "ocio_loader_win.py", ocio_pkg_dir / "__init__.py"
-        )
-        shutil.copyfile(
-            loaders_dir / "oiio_loader_win.py", oiio_pkg_dir / "__init__.py"
-        )
+        shutil.copyfile(loaders_dir / "ocio_loader_win.py", ocio_pkg_dir / "__init__.py")
+        shutil.copyfile(loaders_dir / "oiio_loader_win.py", oiio_pkg_dir / "__init__.py")
     else:
         shutil.copyfile(loaders_dir / "ocio_loader.py", ocio_pkg_dir / "__init__.py")
         shutil.copyfile(loaders_dir / "oiio_loader.py", oiio_pkg_dir / "__init__.py")
@@ -195,19 +187,11 @@ def build_packages(static_build: bool = False) -> None:
         # Copy tool wrappers
         wrappers_dir = here / "oiio_python" / "tool_wrappers"
         if platform.system() == "Windows":
-            shutil.copyfile(
-                wrappers_dir / "oiio_tools_win.py", oiio_pkg_dir / "_tool_wrapper.py"
-            )
-            shutil.copyfile(
-                wrappers_dir / "ocio_tools_win.py", ocio_pkg_dir / "_tool_wrapper.py"
-            )
+            shutil.copyfile(wrappers_dir / "oiio_tools_win.py", oiio_pkg_dir / "_tool_wrapper.py")
+            shutil.copyfile(wrappers_dir / "ocio_tools_win.py", ocio_pkg_dir / "_tool_wrapper.py")
         else:
-            shutil.copyfile(
-                wrappers_dir / "oiio_tools.py", oiio_pkg_dir / "_tool_wrapper.py"
-            )
-            shutil.copyfile(
-                wrappers_dir / "ocio_tools.py", ocio_pkg_dir / "_tool_wrapper.py"
-            )
+            shutil.copyfile(wrappers_dir / "oiio_tools.py", oiio_pkg_dir / "_tool_wrapper.py")
+            shutil.copyfile(wrappers_dir / "ocio_tools.py", ocio_pkg_dir / "_tool_wrapper.py")
 
     # Clean build dirs
     shutil.rmtree(oiio_dir / "build")
@@ -275,9 +259,11 @@ def print_directory_tree(startpath, max_level=None):
 
 if __name__ == "__main__":
 
-    static_build = os.getenv("OIIO_STATIC") == "1"
+    oiio_static = os.getenv("OIIO_STATIC")
+    static_build = str(oiio_static) == "1"
 
     print("=" * 80)
+    print(f"OIIO_STATIC raw value: '{oiio_static}'")
     if static_build:
         print("Building static libraries.")
     else:
