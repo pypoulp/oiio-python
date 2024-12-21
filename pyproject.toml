@@ -34,7 +34,7 @@ before-all = [
   "bash {project}/linux_before_all.sh",
 ]
 repair-wheel-command = [
-  "export LD_LIBRARY_PATH=$PROJECT_ROOT/oiio_python/libs:$LD_LIBRARY_PATH",
+  "export LD_LIBRARY_PATH=/project/oiio_python/libs:$LD_LIBRARY_PATH",
   "auditwheel repair -w {dest_dir} {wheel}",
 ]
 

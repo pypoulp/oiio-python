@@ -56,7 +56,7 @@ def conan_install_package(
     to_build=None,
 ) -> None:
 
-    source_cmd = ["conan", "source", root_folder.as_posix(), "--version", version]
+    source_cmd = ["conan", "source", root_folder.as_posix(), "--version", version, "-vwarning"]
     if to_build is None:
         to_build = ["missing"]
     build_arg_list = []
@@ -82,12 +82,13 @@ def conan_install_package(
         version,
         "--profile",
         profile,
+        "-vwarning",
     ]
 
     install_cmd += build_arg_list
 
-    build_cmd = ["conan", "build", root_folder.as_posix(), "--version", version, "--profile", profile]
-    export_cmd = ["conan", "export-pkg", root_folder.as_posix(), "--version", version]
+    build_cmd = ["conan", "build", root_folder.as_posix(), "--version", version, "--profile", profile, "-vwarning"]
+    export_cmd = ["conan", "export-pkg", root_folder.as_posix(), "--version", version, "-vwarning"]
     if source:
         subprocess.run(source_cmd, check=True)
     subprocess.run(install_cmd, check=True)
@@ -267,6 +268,17 @@ if __name__ == "__main__":
                 "PyOpenColorIO": ["*.*", "licenses/*.*"],
             }
         else:
+            # create a dummy __init__.py file in the tools directory
+            tools_dir = [
+                here / "oiio_python" / "OpenImageIO" / "tools",
+                here / "oiio_python" / "PyOpenColorIO" / "tools",
+            ]
+
+            for tool_dir in tools_dir:
+                if not (tool_dir / "__init__.py").exists():
+                    with open(tool_dir / "__init__.py", "w", encoding="utf8") as f:
+                        f.write("# Required to include tools.")
+
             package_data = {
                 "OpenImageIO": ["*.*", "tools/*.*", "licenses/*.*"],
                 "PyOpenColorIO": ["*.*", "tools/*.*", "licenses/*.*"],
