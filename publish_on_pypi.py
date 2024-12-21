@@ -4,6 +4,7 @@ and publishing the package to PyPI or Test PyPI. It provides a simple CLI interf
 release and test modes.
 """
 
+import os
 import argparse
 import shutil
 import subprocess
@@ -60,7 +61,7 @@ def build_sdist():
     run_command("python setup.py sdist")
 
 
-def publish_to_pypi(repository_url):
+def publish_to_pypi(repository_url, static):
     """
     Publish the package to the specified PyPI repository.
 
@@ -70,7 +71,17 @@ def publish_to_pypi(repository_url):
     print(f"Publishing to {repository_url}...")
 
     dist_files = list((here / "dist").glob("*"))
-    wheel_files = list((here / "wheelhouse").glob("*"))
+
+    if static:
+        wheelhouse = "wheelhouse_static"
+    else:
+        wheelhouse = "wheelhouse"
+
+    if not (here / wheelhouse).exists():
+        print(f"Wheelhouse directory not found: {wheelhouse}")
+        sys.exit(1)
+
+    wheel_files = list((here / "wheelhouse").glob("*.whl"))
 
     print("=" * 80)
     print(
@@ -89,8 +100,16 @@ def publish_to_pypi(repository_url):
         print("Aborted.")
         sys.exit(0)
 
-    run_command(f"twine upload --repository {repository_url} dist/*")
-    run_command(f"twine upload --repository {repository_url} wheelhouse/*")
+    dist_empty = len(dist_files) == 0
+    wheel_empty = len(wheel_files) == 0
+    if dist_empty and wheel_empty:
+        print("No files to publish.")
+        sys.exit(0)
+
+    if not dist_empty:
+        run_command(f"twine upload --repository {repository_url} dist/*")
+    if not wheel_empty:
+        run_command(f"twine upload --repository {repository_url} {wheelhouse}/*")
 
 
 def main():
@@ -104,7 +123,16 @@ def main():
     parser.add_argument(
         "--release", action="store_true", help="Publish to PyPI instead of Test PyPI."
     )
+    parser.add_argument(
+        "--static", action="store_true", help="Publish oiio-static-python."
+    )
+    parser.add_argument(
+        "--nosdist", action="store_true", help="Skip building source distribution."
+    )
     args = parser.parse_args()
+
+    if args.static:
+        os.environ["OIIO_STATIC"] = "1"
 
     if args.release:
         confirm = (
@@ -121,8 +149,9 @@ def main():
 
     # Clean, build, and publish
     cleanup()
-    build_sdist()
-    publish_to_pypi(repository_url)
+    if not args.nosdist:
+        build_sdist()
+    publish_to_pypi(repository_url, args.static)
 
 
 if __name__ == "__main__":

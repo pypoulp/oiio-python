@@ -54,12 +54,12 @@ This project builds two variants of the OpenImageIO Python bindings:
 
 - **`oiio-python`**: 
   - Links against shared OpenImageIO and OpenColorIO libraries.
-  - Generally smaller wheel size.
+  - Generally smaller package size.
   - Includes tools like `oiiotool` and `ociobakelut`.
 
 - **`oiio-static-python`**:
   - Uses statically linked dependencies.
-  - Generally larger wheel size.
+  - Generally larger package size.
   - Does **not** include OpenImageIO and OpenColorIO tools.
   - **Ideal for avoiding DLL conflicts**, especially when using Python embedded in applications like DCC tools that already use OpenImageIO.
 
