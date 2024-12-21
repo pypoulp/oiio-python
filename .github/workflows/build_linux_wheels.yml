@@ -1,0 +1,32 @@
+name: Build Linux Wheels
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_wheels:
+    name: Build ${{ matrix.linking }} wheels on ${{ matrix.manylinux }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        distrib: [manylinux, musllinux]
+        linking: [dynamic, static]
+        os: [ubuntu-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.22.0
+        env:
+          CIBW_PLATFORM: ${{ env.CIBW_PLATFORM }}
+          PROJECT_ROOT: ${{ github.workspace }}
+        with:
+          output-dir: wheelhouse
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: ./wheelhouse/*.whl
