@@ -19,13 +19,11 @@ jobs:
         uses: docker/setup-qemu-action@v3
         with:
           platforms: all
-        
+
       - name: Set environment variables for static or shared builds
-        run: |
-          if [ "${{ matrix.variant }}" == "static" ]; then
-            echo "OIIO_STATIC=1" >> $GITHUB_ENV
-          fi
-      
+        if: matrix.variant == 'static'
+        run: echo "OIIO_STATIC=1" >> $GITHUB_ENV
+
       - name: Build  wheels
         uses: pypa/cibuildwheel@v2.22.0
         env:
