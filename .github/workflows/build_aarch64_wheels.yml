@@ -13,7 +13,7 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         env:
-          OIIO_STATIC: "1"
+          OIIO_STATIC: 1
         with:
           platforms: aarch64
 
@@ -21,7 +21,7 @@ jobs:
         uses: pypa/cibuildwheel@v2.22.0
         env:
           CIBW_ARCHS_LINUX: aarch64
-          OIIO_STATIC: "1"
+          OIIO_STATIC: 1
         with:
           output-dir: wheelhouse
 
