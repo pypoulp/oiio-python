@@ -1,6 +1,6 @@
-# 🐍 **oiio-python**
+# **oiio-python**
 
-**OpenImageIO on wheels!**
+**🐍 OpenImageIO on wheels!**
 
 This project provides (unofficial) multiplatform wheels for [OpenImageIO](https://github.com/AcademySoftwareFoundation/OpenImageIO) Python bindings, simplifying installation and integration into Python projects.
 
