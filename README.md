@@ -164,7 +164,7 @@ Although the primary target is automated builds on GitHub Actions, you can also 
 
 ### **Notes**
 
- - A Github Action exists to build on Linux aarch64 using QEMU emulation, but it's way too slow and reach timeout. Current aarch64 wheels are built locally on a Raspberry Pi 5.
+ - A Github Action exists to build on Linux aarch64 using QEMU emulation, but it's way too slow and reach timeout. Current aarch64 wheels are built locally on a Raspberry Pi 5, only for ManyLinux.
 
  - I'm not an expert in Conan, CMake, or Cibuildwheel. Feedback and suggestions for improvement are highly appreciated.
 
