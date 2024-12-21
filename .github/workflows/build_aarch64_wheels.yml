@@ -20,15 +20,11 @@ jobs:
         with:
           platforms: all
 
-      - name: Set environment variables for static or shared builds
-        if: matrix.variant == 'static'
-        run: echo "OIIO_STATIC=1" >> $GITHUB_ENV
-
       - name: Build  wheels
         uses: pypa/cibuildwheel@v2.22.0
         env:
           CIBW_ARCHS_LINUX: ${{ matrix.arch }}
-          OIIO_STATIC: ${{ env.OIIO_STATIC || '' }}
+          OIIO_STATIC: ${{ matrix.variant == 'static' && '1' || '0' }}
 
       - uses: actions/upload-artifact@v4
         with:
