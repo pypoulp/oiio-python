@@ -35,9 +35,7 @@ def conan_profile_ensure() -> None:
             detect_command = ["conan", "profile", "detect", "--force"]
 
         # Run 'conan profile detect'
-        detect_output = subprocess.run(
-            detect_command, capture_output=True, text=True, check=True
-        )
+        detect_output = subprocess.run(detect_command, capture_output=True, text=True, check=True)
         if detect_output.returncode == 0:
             print("Conan Profile detected successfully.")
         else:
@@ -46,9 +44,7 @@ def conan_profile_ensure() -> None:
         print("Default Conan profile already exists.")
 
     print("\n--- Conan Profile Details ---\n")
-    profile_show_output = subprocess.run(
-        ["conan", "profile", "show"], capture_output=True, text=True, check=True
-    )
+    profile_show_output = subprocess.run(["conan", "profile", "show"], capture_output=True, text=True, check=True)
     print(profile_show_output.stdout)
     print("\n--- End of Profile Details ---\n")
 
@@ -190,12 +186,8 @@ def build_packages(static_build: bool = False) -> None:
 
     # Copy loaders
     if platform.system() == "Windows":
-        shutil.copyfile(
-            loaders_dir / "ocio_loader_win.py", ocio_pkg_dir / "__init__.py"
-        )
-        shutil.copyfile(
-            loaders_dir / "oiio_loader_win.py", oiio_pkg_dir / "__init__.py"
-        )
+        shutil.copyfile(loaders_dir / "ocio_loader_win.py", ocio_pkg_dir / "__init__.py")
+        shutil.copyfile(loaders_dir / "oiio_loader_win.py", oiio_pkg_dir / "__init__.py")
     else:
         shutil.copyfile(loaders_dir / "ocio_loader.py", ocio_pkg_dir / "__init__.py")
         shutil.copyfile(loaders_dir / "oiio_loader.py", oiio_pkg_dir / "__init__.py")
@@ -204,19 +196,11 @@ def build_packages(static_build: bool = False) -> None:
         # Copy tool wrappers
         wrappers_dir = here / "oiio_python" / "tool_wrappers"
         if platform.system() == "Windows":
-            shutil.copyfile(
-                wrappers_dir / "oiio_tools_win.py", oiio_pkg_dir / "_tool_wrapper.py"
-            )
-            shutil.copyfile(
-                wrappers_dir / "ocio_tools_win.py", ocio_pkg_dir / "_tool_wrapper.py"
-            )
+            shutil.copyfile(wrappers_dir / "oiio_tools_win.py", oiio_pkg_dir / "_tool_wrapper.py")
+            shutil.copyfile(wrappers_dir / "ocio_tools_win.py", ocio_pkg_dir / "_tool_wrapper.py")
         else:
-            shutil.copyfile(
-                wrappers_dir / "oiio_tools.py", oiio_pkg_dir / "_tool_wrapper.py"
-            )
-            shutil.copyfile(
-                wrappers_dir / "ocio_tools.py", ocio_pkg_dir / "_tool_wrapper.py"
-            )
+            shutil.copyfile(wrappers_dir / "oiio_tools.py", oiio_pkg_dir / "_tool_wrapper.py")
+            shutil.copyfile(wrappers_dir / "ocio_tools.py", ocio_pkg_dir / "_tool_wrapper.py")
 
     # Clean build dirs
     shutil.rmtree(oiio_dir / "build")
@@ -289,16 +273,10 @@ if __name__ == "__main__":
                 "PyOpenColorIO": ["*.*", "licenses/*.*"],
             }
         else:
-            # create a dummy __init__.py file in the tools directory
             tools_dir = [
                 here / "oiio_python" / "OpenImageIO" / "tools",
                 here / "oiio_python" / "PyOpenColorIO" / "tools",
             ]
-
-            # for tool_dir in tools_dir:
-            #     if not (tool_dir / "__init__.py").exists():
-            #         with open(tool_dir / "__init__.py", "w", encoding="utf8") as f:
-            #             f.write("# Required to include tools.")
 
             package_data = {
                 "OpenImageIO": ["*.*", "tools/*", "licenses/*.*"],
@@ -342,11 +320,13 @@ if __name__ == "__main__":
         include_data = False
         zip_safe = True
 
-    package_name = "oiio-python-static" if static_build else "oiio-python"
+    package_name = "oiio-static-python" if static_build else "oiio-python"
+
+    long_description = (here / "README.md").read_text(encoding="utf8")
 
     setup(
         name=package_name,
-        version="2.5.12.0",
+        version="2.5.12.0.1",
         package_dir={"": "oiio_python"},
         packages=find_packages(where="oiio_python"),
         package_data=package_data,
@@ -357,8 +337,9 @@ if __name__ == "__main__":
             "console_scripts": scripts_list,
         },
         zip_safe=zip_safe,  # Required for including DLLs and PYDs in wheel
-        long_description_content_type="text/markdown",
         description="Unofficial OpenImageIO Python wheels, including OpenColorIO",
+        long_description=long_description,
+        long_description_content_type="text/markdown",
         author="Paul Parneix",
         author_email="thepoulp@pm.me",
         url="https://github.com/pypoulp/oiio-python",
@@ -380,6 +361,7 @@ if __name__ == "__main__":
         ],
         extras_require={
             "dev": [
+                "twine",
                 "black==24.2.0",
                 "isort==5.13.2",
             ],
