@@ -61,8 +61,14 @@ def conan_install_package(
         to_build = ["missing"]
     build_arg_list = []
     if platform.system() == "Linux":
-        # Build everything on Linux to maximize compatibility on ManyLinux
-        build_arg_list.append("--build=*")
+        # Build everything on Linux to maximize compatibility on ManyLinux.
+        # when using --build=*, conan rebuilds everything even if found in local cache. This is not ideal.
+        # Lets use a lockfile to avoid rebuilding everything. after the first build.
+        if (here / "linux_conan.check").exists():
+            build_arg_list.append("--no-remote")
+            build_arg_list.append("--build=missing")
+        else:
+            build_arg_list.append("--build=*")
     else:
         for b in to_build:
             build_arg = f"--build={b}"
@@ -175,16 +181,24 @@ def build_packages(static_build: bool = False) -> None:
     shutil.rmtree(libraw_dep_dir / "test_package" / "build")
     os.remove(libraw_dep_dir / "test_package" / "CMakeUserPresets.json")
 
+    # Create a check file for Linux to avoid rebuilding everything on the next run
+    # on same environment.
 
-if platform.system() == "Windows":
-    lib_ext = ".dll"
-    pylib_ext = ".pyd"
-elif platform.system() == "Darwin":
-    lib_ext = ".dylib"
-    pylib_ext = ".so"
-else:
-    lib_ext = ".so"
-    pylib_ext = ".so"
+    if platform.system() == "Linux":
+        if not (here / "linux_conan.check").exists():
+            with open(here / "linux_conan.check", "w", encoding="utf8") as f:
+                f.write("1")
+
+
+# if platform.system() == "Windows":
+#     lib_ext = ".dll"
+#     pylib_ext = ".pyd"
+# elif platform.system() == "Darwin":
+#     lib_ext = ".dylib"
+#     pylib_ext = ".so"
+# else:
+#     lib_ext = ".so"
+#     pylib_ext = ".so"
 
 
 class BinaryDistribution(Distribution):
