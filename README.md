@@ -148,10 +148,11 @@ Although the primary target is automated builds on GitHub Actions, you can also 
     - Ensure Perl is installed (required for dependencies).
     - Use `linux_before_all.sh` if needed.
 
-    ```bash
-    python -m pip install build
-    python -m build --wheel
-    ```
+
+        ```bash
+        python -m pip install build
+        python -m build --wheel
+        ```
 
 4. If not building with cibuildwheel, you'll need to manually "repair" the wheel with auditwheel after build:
 
