@@ -39,13 +39,12 @@ def conan_profile_ensure() -> None:
             print("Error detecting Conan profile:", detect_output.stderr)
     else:
         print("Default Conan profile already exists.")
-    
+
     print("\n--- Conan Profile Details ---\n")
-    profile_show_output = subprocess.run(
-        ["conan", "profile", "show"], capture_output=True, text=True, check=True
-    )
+    profile_show_output = subprocess.run(["conan", "profile", "show"], capture_output=True, text=True, check=True)
     print(profile_show_output.stdout)
     print("\n--- End of Profile Details ---\n")
+
 
 def conan_install_package(
     root_folder: Path,
@@ -210,7 +209,7 @@ class BinaryDistribution(Distribution):
 def print_directory_tree(startpath, max_level=None):
     """
     Print the directory tree starting from `startpath`.
-    
+
     Args:
         startpath (str): The root directory to print the tree for.
         max_level (int, optional): Maximum depth of the tree to display. Defaults to None (no limit).
@@ -219,14 +218,14 @@ def print_directory_tree(startpath, max_level=None):
     for root, dirs, files in os.walk(startpath):
         # Calculate the depth of the current directory
         level = root.replace(startpath, "").count(os.sep)
-        
+
         # Limit depth if max_level is specified
         if max_level is not None and level > max_level:
             continue
-        
+
         indent = " " * 4 * level
         print(f"{indent}[DIR] {os.path.basename(root)}/")
-        
+
         sub_indent = " " * 4 * (level + 1)
         for f in files:
             print(f"{sub_indent}[FILE] {f}")
@@ -274,14 +273,14 @@ if __name__ == "__main__":
                 here / "oiio_python" / "PyOpenColorIO" / "tools",
             ]
 
-            for tool_dir in tools_dir:
-                if not (tool_dir / "__init__.py").exists():
-                    with open(tool_dir / "__init__.py", "w", encoding="utf8") as f:
-                        f.write("# Required to include tools.")
+            # for tool_dir in tools_dir:
+            #     if not (tool_dir / "__init__.py").exists():
+            #         with open(tool_dir / "__init__.py", "w", encoding="utf8") as f:
+            #             f.write("# Required to include tools.")
 
             package_data = {
-                "OpenImageIO": ["*.*", "tools/*.*", "licenses/*.*"],
-                "PyOpenColorIO": ["*.*", "tools/*.*", "licenses/*.*"],
+                "OpenImageIO": ["*.*", "tools/*", "licenses/*.*"],
+                "PyOpenColorIO": ["*.*", "tools/*", "licenses/*.*"],
             }
 
         include_data = True
