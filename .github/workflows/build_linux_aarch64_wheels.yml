@@ -4,35 +4,50 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_wheels:
-    name: Build ${{ matrix.variant }} aarch64 wheels
+  build_static_wheels:
+    name: Build static Linux aarch64 wheels
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        variant: [shared, static]
-        arch: [aarch64]
-
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         with:
-          platforms: all
-        
-      - name: Set environment variables for static or shared builds
-        run: |
-          if [ "${{ matrix.variant }}" == "static" ]; then
-            echo "OIIO_STATIC=1" >> $GITHUB_ENV
-          fi
-      
-      - name: Build  wheels
+          platforms: aarch64
+
+      - name: Build static wheels
         uses: pypa/cibuildwheel@v2.22.0
         env:
-          CIBW_ARCHS_LINUX: ${{ matrix.arch }}
-          OIIO_STATIC: ${{ env.OIIO_STATIC || '' }}
+          CIBW_ARCHS_LINUX: aarch64
+          OIIO_STATIC: 1
+          CIBW_ENVIRONMENT: OIIO_STATIC=1
+        with:
+          output-dir: wheelhouse
 
       - uses: actions/upload-artifact@v4
         with:
-          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          name: cibw-static-wheels-linux-aarch64
+          path: ./wheelhouse/*.whl
+  
+  build_shared_wheels:
+    name: Build shared Linux aarch64 wheels
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: aarch64
+
+      - name: Build shared wheels
+        uses: pypa/cibuildwheel@v2.22.0
+        env:
+          CIBW_ARCHS_LINUX: aarch64
+        with:
+          output-dir: wheelhouse
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-shared-wheels-linux-aarch64
           path: ./wheelhouse/*.whl

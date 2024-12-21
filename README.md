@@ -1,6 +1,6 @@
 # 🐍 **oiio-python**
 
-**OpenImageIO on wheels !**
+**OpenImageIO on wheels!**
 
 This project provides (unofficial) multiplatform wheels for [OpenImageIO](https://github.com/AcademySoftwareFoundation/OpenImageIO) Python bindings, simplifying installation and integration into Python projects.
 
@@ -8,8 +8,9 @@ This project provides (unofficial) multiplatform wheels for [OpenImageIO](https:
 
 ## **Features**
 
-- **🚀 Easy Installation**: Install via pip—no compilation needed.
-- **🌐 Multiplatform**: Supports Windows (x64), macOS (x64 & arm64), and Linux (x64 & aarch64).
+- **🚀 Easy Installation**: Install via pip—no need to compile.
+- **🌐 Multiplatform**: Supports Windows (x86_64), macOS (x86_64 and arm64), and Linux (x86_64 and aarch64).
+  
 - **🎨 Integrated OpenColorIO**: Includes PyOpenColorIO for seamless color management.
 - **⚙️ Automated Builds**: Built using [Conan](https://docs.conan.io/2/), [Cibuildwheel](https://cibuildwheel.pypa.io/en/stable/), and [GitHub Actions](https://github.com/features/actions).
 - **📦 Flexible Libraries**: Choose between static and shared libraries to suit your needs.
@@ -18,9 +19,10 @@ This project provides (unofficial) multiplatform wheels for [OpenImageIO](https:
 
 ## **Installation**
 
-🚧 **Note**: Installation is still a work in progress.
-
 ```bash
+# ensure pip is up-to-date:
+python -m pip install --upgrade pip
+
 # Install the shared libraries variant:
 pip install oiio-python
 
@@ -52,16 +54,16 @@ This project builds two variants of the OpenImageIO Python bindings:
 
 - **`oiio-python`**: 
   - Links against shared OpenImageIO and OpenColorIO libraries.
-  - Smaller wheel size.
+  - Generally smaller package size.
   - Includes tools like `oiiotool` and `ociobakelut`.
 
 - **`oiio-static-python`**:
   - Uses statically linked dependencies.
-  - Larger wheel size.
+  - Generally larger package size.
   - Does **not** include OpenImageIO and OpenColorIO tools.
-  - **Ideal for avoiding DLL conflicts**, especially when using Python embeded in applications like DCC tools that already use OpenImageIO.
+  - **Ideal for avoiding DLL conflicts**, especially when using Python embedded in applications like DCC tools that already use OpenImageIO.
 
----
+`oiio-python` versions match the original OpenImageIO release version, with an additional build number for the Python bindings. Example oiio-python 2.5.12.0.x is built from OpenImageIO 2.5.12
 
 ## **Building the Wheels Yourself**
 
@@ -82,11 +84,11 @@ Although the primary target is automated builds on GitHub Actions, you can also 
 3. To only build for your current Python version:
 
     ```powershell
-    python -m pip build
+    python -m pip install build
     python -m build --wheel
     ```
 
-#### **MacOS**
+### **MacOS**
 
 1. Install Python (3.11+ recommended), Homebrew, and Xcode.
 2. Set environment variables before building:
@@ -104,7 +106,7 @@ Although the primary target is automated builds on GitHub Actions, you can also 
 3. To run cibuildwheel and build wheels for multiple python versions:
 
     ```bash
-    python - m pip install cibuildwheel
+    python -m pip install cibuildwheel
     cibuildwheel --platform macos
     ```
 
@@ -128,13 +130,16 @@ Although the primary target is automated builds on GitHub Actions, you can also 
     DYLD_LIBRARY_PATH=$REPAIR_LIBRARY delocate-wheel -w /repaired/out/folder -v /path/to/wheel -e $HOME/.conan2
     ```
 
-#### **Linux**
+### **Linux**
 
 1. Linux builds use Docker containers via cibuildwheel for compatibility.
 2. Install Docker and build:
 
     ```bash
-    python - m pip install cibuildwheel
+    export CIBW_ENVIRONMENT="OIIO_STATIC=1"  # For the static version
+    # Optional: Specify target docker image / platform
+    export CIBW_BUILD="*manylinux_x86*"
+    python -m pip install cibuildwheel
     cibuildwheel
     ```
 
@@ -143,10 +148,11 @@ Although the primary target is automated builds on GitHub Actions, you can also 
     - Ensure Perl is installed (required for dependencies).
     - Use `linux_before_all.sh` if needed.
 
-    ```bash
-    python -m pip install build
-    python -m build --wheel
-    ```
+
+        ```bash
+        python -m pip install build
+        python -m build --wheel
+        ```
 
 4. If not building with cibuildwheel, you'll need to manually "repair" the wheel with auditwheel after build:
 
@@ -157,13 +163,12 @@ Although the primary target is automated builds on GitHub Actions, you can also 
     auditwheel repair -w /repaired/out/folder /path/to/wheel 
     ```
 
-### Status
+### **Notes**
 
-🚧 **Work in Progress**: This project is under active development. Contributions and feedback are welcome!
+ - A Github Action exists to build on Linux aarch64 using QEMU emulation, but it's way too slow and reach timeout. Current aarch64 wheels are built locally on a Raspberry Pi 5, only for manyLinux.
 
-**Notes**
  - I'm not an expert in Conan, CMake, or Cibuildwheel. Feedback and suggestions for improvement are highly appreciated.
 
  - Optimizing the build process to avoid rebuilding LibOpenImageIO for each Python version is a potential area for improvement.
 
- - Although Conan may not be ideal for building wheels, it's currently used here due to the complexity of dependencies and the need to build from scratch for ManyLinux compatibility.
+ - Although Conan may not be ideal for building wheels, it's currently used here due to the complexity of dependencies and the need to build from scratch for manyLinux/musllinux compatibility.

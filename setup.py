@@ -1,3 +1,5 @@
+# pylint: disable=missing-module-docstring,missing-function-docstring,missing-class-docstring,invalid-name
+
 import os
 import platform
 import shutil
@@ -77,9 +79,18 @@ def conan_install_package(
         # Build everything on Linux to maximize compatibility on ManyLinux.
         # when using --build=*, conan rebuilds everything even if found in local cache. This is not ideal.
         # Lets use a lockfile to avoid rebuilding everything. after the first build.
-        if (here / "linux_conan.check").exists():
-            build_arg_list.append("--no-remote")
-            build_arg_list.append("--build=missing")
+        check_file_path = here / "linux_conan.check"
+        if check_file_path.exists() and os.getenv("CIBUILDWHEEL") == "1":
+            auditwheel_policy = os.getenv("AUDITWHEEL_POLICY")
+            with open(check_file_path, "r", encoding="utf8") as f:
+                check_policy = f.read().strip()
+
+            if check_policy == auditwheel_policy:
+                print("Using lockfile to avoid rebuilding everything.")
+                build_arg_list.append("--no-remote")
+                build_arg_list.append("--build=missing")
+            else:
+                build_arg_list.append("--build=*")
         else:
             build_arg_list.append("--build=*")
     else:
@@ -131,7 +142,7 @@ def is_executable(file_path: Path):
     return file_path.is_file() and os.access(file_path, os.X_OK)
 
 
-def build_packages(static_build: bool = False) -> None:
+def build_packages(build_static_version: bool = False) -> None:
     ocio_pkg_dir = here / "oiio_python" / "PyOpenColorIO"
     oiio_pkg_dir = here / "oiio_python" / "OpenImageIO"
 
@@ -191,7 +202,7 @@ def build_packages(static_build: bool = False) -> None:
         shutil.copyfile(loaders_dir / "ocio_loader.py", ocio_pkg_dir / "__init__.py")
         shutil.copyfile(loaders_dir / "oiio_loader.py", oiio_pkg_dir / "__init__.py")
 
-    if not static_build:
+    if not build_static_version:
         # Copy tool wrappers
         wrappers_dir = here / "oiio_python" / "tool_wrappers"
         if platform.system() == "Windows":
@@ -226,21 +237,10 @@ def build_packages(static_build: bool = False) -> None:
     # Create a check file for Linux to avoid rebuilding everything on the next run
     # on same environment.
 
-    if platform.system() == "Linux":
-        if not (here / "linux_conan.check").exists():
-            with open(here / "linux_conan.check", "w", encoding="utf8") as f:
-                f.write("1")
-
-
-# if platform.system() == "Windows":
-#     lib_ext = ".dll"
-#     pylib_ext = ".pyd"
-# elif platform.system() == "Darwin":
-#     lib_ext = ".dylib"
-#     pylib_ext = ".so"
-# else:
-#     lib_ext = ".so"
-#     pylib_ext = ".so"
+    if platform.system() == "Linux" and os.getenv("CIBUILDWHEEL") == "1":
+        auditwheel_policy = os.getenv("AUDITWHEEL_POLICY")
+        with open(here / "linux_conan.check", "w", encoding="utf8") as f:
+            f.write(str(auditwheel_policy))
 
 
 class BinaryDistribution(Distribution):
@@ -248,36 +248,18 @@ class BinaryDistribution(Distribution):
         return True
 
 
-def print_directory_tree(startpath, max_level=None):
-    """
-    Print the directory tree starting from `startpath`.
-
-    Args:
-        startpath (str): The root directory to print the tree for.
-        max_level (int, optional): Maximum depth of the tree to display. Defaults to None (no limit).
-    """
-    startpath = str(startpath)
-    for root, dirs, files in os.walk(startpath):
-        # Calculate the depth of the current directory
-        level = root.replace(startpath, "").count(os.sep)
-
-        # Limit depth if max_level is specified
-        if max_level is not None and level > max_level:
-            continue
-
-        indent = " " * 4 * level
-        print(f"{indent}[DIR] {os.path.basename(root)}/")
-
-        sub_indent = " " * 4 * (level + 1)
-        for f in files:
-            print(f"{sub_indent}[FILE] {f}")
-
-
 if __name__ == "__main__":
 
-    static_build = os.getenv("OIIO_STATIC") == "1"
+    oiio_static = os.getenv("OIIO_STATIC")
+    static_build = str(oiio_static) == "1"
+
+    import json
+
+    env_vars = dict(os.environ)
+    print(json.dumps(env_vars, indent=4))
 
     print("=" * 80)
+    print(f"OIIO_STATIC raw value: '{oiio_static}'")
     if static_build:
         print("Building static libraries.")
     else:
@@ -309,16 +291,10 @@ if __name__ == "__main__":
                 "PyOpenColorIO": ["*.*", "licenses/*.*"],
             }
         else:
-            # create a dummy __init__.py file in the tools directory
             tools_dir = [
                 here / "oiio_python" / "OpenImageIO" / "tools",
                 here / "oiio_python" / "PyOpenColorIO" / "tools",
             ]
-
-            # for tool_dir in tools_dir:
-            #     if not (tool_dir / "__init__.py").exists():
-            #         with open(tool_dir / "__init__.py", "w", encoding="utf8") as f:
-            #             f.write("# Required to include tools.")
 
             package_data = {
                 "OpenImageIO": ["*.*", "tools/*", "licenses/*.*"],
@@ -362,11 +338,13 @@ if __name__ == "__main__":
         include_data = False
         zip_safe = True
 
-    package_name = "oiio-python-static" if static_build else "oiio-python"
+    package_name = "oiio-static-python" if static_build else "oiio-python"
+
+    long_description = (here / "README.md").read_text(encoding="utf8")
 
     setup(
         name=package_name,
-        version="2.5.12.0",
+        version="2.5.12.0.1",
         package_dir={"": "oiio_python"},
         packages=find_packages(where="oiio_python"),
         package_data=package_data,
@@ -377,8 +355,9 @@ if __name__ == "__main__":
             "console_scripts": scripts_list,
         },
         zip_safe=zip_safe,  # Required for including DLLs and PYDs in wheel
-        long_description_content_type="text/markdown",
         description="Unofficial OpenImageIO Python wheels, including OpenColorIO",
+        long_description=long_description,
+        long_description_content_type="text/markdown",
         author="Paul Parneix",
         author_email="thepoulp@pm.me",
         url="https://github.com/pypoulp/oiio-python",
@@ -400,6 +379,7 @@ if __name__ == "__main__":
         ],
         extras_require={
             "dev": [
+                "twine",
                 "black==24.2.0",
                 "isort==5.13.2",
             ],
