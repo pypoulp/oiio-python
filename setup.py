@@ -1,246 +1,17 @@
-# pylint: disable=missing-module-docstring,missing-function-docstring,missing-class-docstring,invalid-name
-
+# pylint: disable=wrong-import-position,missing-module-docstring,missing-function-docstring,missing-class-docstring,invalid-name
 import os
 import platform
 import shutil
-import subprocess
 import sys
 from pathlib import Path
 
 from setuptools import find_packages, setup
 from setuptools.dist import Distribution
 
+sys.path.insert(0, os.path.dirname(__file__))
+from setuputils import build_dependencies, build_packages, relink_and_delocate
+
 here = Path(__file__).parent.resolve()
-
-
-def conan_profile_ensure() -> None:
-    # Check if the default profile exists by listing profiles
-    list_profiles_output = subprocess.run(
-        ["conan", "profile", "list", "--path"],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    profiles = list_profiles_output.stdout.strip().splitlines()
-    if "default" not in profiles:
-
-        system = platform.system()
-        machine = platform.machine()
-
-        print("Default Conan profile not found. Running 'conan profile detect'.")
-
-        if system == "Darwin" and machine == "arm64":
-            print("Running Conan profile detection for macOS ARM64.")
-            detect_command = ["arch", "-arm64", "conan", "profile", "detect", "--force"]
-        else:
-            print(f"Running Conan profile detection for {system} on {machine}.")
-            detect_command = ["conan", "profile", "detect", "--force"]
-
-        # Run 'conan profile detect'
-        detect_output = subprocess.run(
-            detect_command, capture_output=True, text=True, check=True
-        )
-        if detect_output.returncode == 0:
-            print("Conan Profile detected successfully.")
-        else:
-            print("Error detecting Conan profile:", detect_output.stderr)
-    else:
-        print("Default Conan profile already exists.")
-
-    print("\n--- Conan Profile Details ---\n")
-    profile_show_output = subprocess.run(
-        ["conan", "profile", "show"], capture_output=True, text=True, check=True
-    )
-    print(profile_show_output.stdout)
-    print("\n--- End of Profile Details ---\n")
-
-
-def conan_install_package(
-    root_folder: Path,
-    version: str,
-    profile: str,
-    source: bool = True,
-    export: bool = True,
-    to_build=None,
-) -> None:
-
-    source_cmd = [
-        "conan",
-        "source",
-        root_folder.as_posix(),
-        "--version",
-        version,
-        "-vwarning",
-    ]
-    if to_build is None:
-        to_build = ["missing"]
-    build_arg_list = []
-    if platform.system() == "Linux":
-        # Build everything on Linux to maximize compatibility on ManyLinux.
-        # when using --build=*, conan rebuilds everything even if found in local cache. This is not ideal.
-        # Lets use a lockfile to avoid rebuilding everything. after the first build.
-        check_file_path = here / "linux_conan.check"
-        if check_file_path.exists() and os.getenv("CIBUILDWHEEL") == "1":
-            auditwheel_policy = os.getenv("AUDITWHEEL_POLICY")
-            with open(check_file_path, "r", encoding="utf8") as f:
-                check_policy = f.read().strip()
-
-            if check_policy == auditwheel_policy:
-                print("Using lockfile to avoid rebuilding everything.")
-                build_arg_list.append("--no-remote")
-                build_arg_list.append("--build=missing")
-            else:
-                build_arg_list.append("--build=*")
-        else:
-            build_arg_list.append("--build=*")
-    else:
-        for b in to_build:
-            build_arg = f"--build={b}"
-            build_arg_list.append(build_arg)
-
-    install_cmd = [
-        "conan",
-        "install",
-        root_folder.as_posix(),
-        "--version",
-        version,
-        "--profile",
-        profile,
-        "-vwarning",
-    ]
-
-    install_cmd += build_arg_list
-
-    build_cmd = [
-        "conan",
-        "build",
-        root_folder.as_posix(),
-        "--version",
-        version,
-        "--profile",
-        profile,
-        "-vwarning",
-    ]
-    export_cmd = [
-        "conan",
-        "export-pkg",
-        root_folder.as_posix(),
-        "--version",
-        version,
-        "-vwarning",
-    ]
-    if source:
-        subprocess.run(source_cmd, check=True)
-    subprocess.run(install_cmd, check=True)
-    subprocess.run(build_cmd, check=True)
-    if export:
-        subprocess.run(export_cmd, check=True)
-
-
-def is_executable(file_path: Path):
-    """Check if the given file is executable."""
-    return file_path.is_file() and os.access(file_path, os.X_OK)
-
-
-def build_packages(build_static_version: bool = False) -> None:
-    ocio_pkg_dir = here / "oiio_python" / "PyOpenColorIO"
-    oiio_pkg_dir = here / "oiio_python" / "OpenImageIO"
-
-    for package_dir in [ocio_pkg_dir, oiio_pkg_dir]:
-        if package_dir.exists():
-            shutil.rmtree(package_dir)
-        package_dir.mkdir()
-
-    libs_dir = here / "oiio_python" / "libs"
-    if libs_dir.exists():
-        shutil.rmtree(libs_dir)
-    libs_dir.mkdir()
-
-    os.environ["OCIO_PKG_DIR"] = ocio_pkg_dir.as_posix()
-    os.environ["OIIO_PKG_DIR"] = oiio_pkg_dir.as_posix()
-    os.environ["OIIO_LIBS_DIR"] = libs_dir.as_posix()
-
-    subprocess.run(["conan", "profile", "detect", "--force"], check=True)
-    profile_name = "default"
-
-    # LibRaw
-    libraw_dep_dir = here / "oiio_python" / "recipes" / "dependencies" / "libraw"
-    libraw_version = "0.21.2"
-
-    conan_install_package(libraw_dep_dir, libraw_version, profile=profile_name)
-
-    # OpenColorIO
-    ocio_dep_dir = here / "oiio_python" / "recipes" / "opencolorio"
-    ocio_version = "2.2.1"
-
-    conan_install_package(ocio_dep_dir, ocio_version, profile=profile_name)
-
-    # OpenImageIO
-    oiio_dir = here / "oiio_python" / "recipes" / "openimageio"
-    oiio_version = "2.5.12.0"
-
-    conan_install_package(oiio_dir, oiio_version, profile=profile_name)
-
-    # Copy loaders
-    loaders_dir = here / "oiio_python" / "loaders"
-
-    if (oiio_pkg_dir / "__init__.py").exists():
-        os.remove(oiio_pkg_dir / "__init__.py")
-
-    if (ocio_pkg_dir / "__init__.py").exists():
-        os.remove(ocio_pkg_dir / "__init__.py")
-
-    # Copy loaders
-    if platform.system() == "Windows":
-        shutil.copyfile(
-            loaders_dir / "ocio_loader_win.py", ocio_pkg_dir / "__init__.py"
-        )
-        shutil.copyfile(
-            loaders_dir / "oiio_loader_win.py", oiio_pkg_dir / "__init__.py"
-        )
-    else:
-        shutil.copyfile(loaders_dir / "ocio_loader.py", ocio_pkg_dir / "__init__.py")
-        shutil.copyfile(loaders_dir / "oiio_loader.py", oiio_pkg_dir / "__init__.py")
-
-    if not build_static_version:
-        # Copy tool wrappers
-        wrappers_dir = here / "oiio_python" / "tool_wrappers"
-        if platform.system() == "Windows":
-            shutil.copyfile(
-                wrappers_dir / "oiio_tools_win.py", oiio_pkg_dir / "_tool_wrapper.py"
-            )
-            shutil.copyfile(
-                wrappers_dir / "ocio_tools_win.py", ocio_pkg_dir / "_tool_wrapper.py"
-            )
-        else:
-            shutil.copyfile(
-                wrappers_dir / "oiio_tools.py", oiio_pkg_dir / "_tool_wrapper.py"
-            )
-            shutil.copyfile(
-                wrappers_dir / "ocio_tools.py", ocio_pkg_dir / "_tool_wrapper.py"
-            )
-
-    # Clean build dirs
-    shutil.rmtree(oiio_dir / "build")
-    shutil.rmtree(oiio_dir / "src")
-    shutil.rmtree(ocio_dep_dir / "build")
-    shutil.rmtree(ocio_dep_dir / "src")
-    shutil.rmtree(libraw_dep_dir / "build")
-    shutil.rmtree(libraw_dep_dir / "src")
-    shutil.rmtree(ocio_dep_dir / "test_package" / "build")
-    os.remove(ocio_dep_dir / "test_package" / "CMakeUserPresets.json")
-    shutil.rmtree(oiio_dir / "test_package" / "build")
-    os.remove(oiio_dir / "test_package" / "CMakeUserPresets.json")
-    shutil.rmtree(libraw_dep_dir / "test_package" / "build")
-    os.remove(libraw_dep_dir / "test_package" / "CMakeUserPresets.json")
-
-    # Create a check file for Linux to avoid rebuilding everything on the next run
-    # on same environment.
-
-    if platform.system() == "Linux" and os.getenv("CIBUILDWHEEL") == "1":
-        auditwheel_policy = os.getenv("AUDITWHEEL_POLICY")
-        with open(here / "linux_conan.check", "w", encoding="utf8") as f:
-            f.write(str(auditwheel_policy))
 
 
 class BinaryDistribution(Distribution):
@@ -253,13 +24,7 @@ if __name__ == "__main__":
     oiio_static = os.getenv("OIIO_STATIC")
     static_build = str(oiio_static) == "1"
 
-    import json
-
-    env_vars = dict(os.environ)
-    print(json.dumps(env_vars, indent=4))
-
     print("=" * 80)
-    print(f"OIIO_STATIC raw value: '{oiio_static}'")
     if static_build:
         print("Building static libraries.")
     else:
@@ -267,14 +32,15 @@ if __name__ == "__main__":
     print("=" * 80)
 
     if "bdist_wheel" in sys.argv:
-        conan_profile_ensure()
+        # When running on Cibuildwheel, avoid rebuilding dependencies for each version.
+        if os.getenv("CIBUILDWHEEL") != "1":
+            build_dependencies()
+        # Build OpenColorIO and OpenImageIO
         build_packages(static_build)
-
         # Fix shared libraries on macos
         if not static_build and platform.system() == "Darwin":
-            cmd = [sys.executable, (here / "macos_fix_shared_libs.py").as_posix()]
-            subprocess.run(cmd, check=True)
-
+            relink_and_delocate()
+        # Include tools if using shared libraries version
         if static_build:
             # Cleanup tools directories if needed
             tool_dirs = [
@@ -344,7 +110,8 @@ if __name__ == "__main__":
 
     setup(
         name=package_name,
-        version="2.5.12.0.1",
+        version="3.0.1.0.1",
+        license_files=("LICENSE-LGPL", "LICENSE"),
         package_dir={"": "oiio_python"},
         packages=find_packages(where="oiio_python"),
         package_data=package_data,
@@ -359,7 +126,6 @@ if __name__ == "__main__":
         long_description=long_description,
         long_description_content_type="text/markdown",
         author="Paul Parneix",
-        author_email="thepoulp@pm.me",
         url="https://github.com/pypoulp/oiio-python",
         classifiers=[
             "Programming Language :: Python",
@@ -370,12 +136,15 @@ if __name__ == "__main__":
             "Programming Language :: Python :: 3.10",
             "Programming Language :: Python :: 3.11",
             "Programming Language :: Python :: 3.12",
+            "Programming Language :: Python :: 3.13",
             "Programming Language :: C++",
             "Programming Language :: Python :: Implementation :: CPython",
+            "License :: OSI Approved :: MIT License",
+            "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
         ],
-        python_requires=">=3.8,<3.13",
+        python_requires=">=3.8,<3.14",
         install_requires=[
-            "numpy>=1.21.2,<2.0.0",  # Dependencies from pyproject.toml
+            "numpy>=1.21.2,<2.0.0",
         ],
         extras_require={
             "dev": [
