@@ -67,6 +67,25 @@ This project builds two variants of the OpenImageIO Python bindings:
 
 `oiio-python` versions match the original OpenImageIO release version, with an additional build number for the Python bindings. Example oiio-python 2.5.12.0.x is built from OpenImageIO 2.5.12
 
+## License
+
+Code in this repository is licensed under [Apache 2.0 License](LICENSE) to match original OpenImageIO license.
+
+However, the binary wheels include statically linked libraries:
+- LibRaw (LGPL 2.1)
+- LibHeif (LGPL 3.0)
+
+**Therefore, the distributed wheels are licensed under [LGPL 3.0 License](LICENSE-LGPL).**
+
+If your project is not compatible with LGPL 3.0, you have several options:
+1. Build the wheels yourself using shared libraries
+2. Build the wheels yourself with disabled LGPL dependencies
+
+Source code for LGPL components:
+- LibRaw: https://github.com/LibRaw/LibRaw
+- LibHeif: https://github.com/strukturag/libheif
+
+
 ## **Building the Wheels Yourself**
 
 Although the primary target is automated builds on GitHub Actions, you can also build the wheels locally.
