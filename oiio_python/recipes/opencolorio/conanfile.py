@@ -6,19 +6,19 @@ from pathlib import Path
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
-from conan.tools.microsoft import is_msvc
 from conan.tools.apple import is_apple_os
 from conan.tools.build import check_min_cppstd, default_cppstd
-from conan.tools.scm import Version
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
-from conan.tools.files import copy
 from conan.tools.files import (
     apply_conandata_patches,
+    copy,
     export_conandata_patches,
     get,
     rm,
     rmdir,
 )
+from conan.tools.microsoft import is_msvc
+from conan.tools.scm import Version
 
 
 class OpenColorIOConan(ConanFile):
@@ -40,7 +40,7 @@ class OpenColorIOConan(ConanFile):
         "fPIC": True,
         "use_sse": True,
     }
-    tool_requires = "cmake/[>=3.16 <4]"
+    # tool_requires = "cmake/[>=3.16 <4]"
 
     def export_sources(self):
         export_conandata_patches(self)
@@ -89,7 +89,8 @@ class OpenColorIOConan(ConanFile):
         if (
             Version(self.version) >= "2.3.0"
             and self.settings.compiler == "gcc"  # pylint: disable=no-member
-            and Version(self.settings.compiler.version) < "6.0"  # pylint: disable=no-member
+            and Version(self.settings.compiler.version)
+            < "6.0"  # pylint: disable=no-member
         ):
             raise ConanInvalidConfiguration(f"{self.ref} requires gcc >= 6.0")
 
@@ -98,27 +99,38 @@ class OpenColorIOConan(ConanFile):
             and self.settings.compiler == "clang"
             and self.settings.compiler.libcxx == "libc++"
         ):  # pylint: disable=no-member
-            raise ConanInvalidConfiguration(f"{self.ref} deosn't support clang with libc++")
+            raise ConanInvalidConfiguration(
+                f"{self.ref} deosn't support clang with libc++"
+            )
 
         # opencolorio>=2.2.0 requires minizip-ng with with_zlib
-        if Version(self.version) >= "2.2.0" and not self.dependencies["minizip-ng"].options.get_safe(
-            "with_zlib", False
-        ):
+        if Version(self.version) >= "2.2.0" and not self.dependencies[
+            "minizip-ng"
+        ].options.get_safe("with_zlib", False):
             raise ConanInvalidConfiguration(
                 f"{self.ref} requires minizip-ng with with_zlib = True. On Apple platforms with_libcomp = False is also needed to enable the with_zlib option."
             )
 
-        if Version(self.version) >= "2.2.1" and self.options.shared and self.dependencies["minizip-ng"].options.shared:
-            raise ConanInvalidConfiguration(f"{self.ref} requires static build minizip-ng")
+        if (
+            Version(self.version) >= "2.2.1"
+            and self.options.shared
+            and self.dependencies["minizip-ng"].options.shared
+        ):
+            raise ConanInvalidConfiguration(
+                f"{self.ref} requires static build minizip-ng"
+            )
 
     def source(self):
-        get(self, **self.conan_data["sources"][self.version], strip_root=True)  # pylint: disable=no-member
+        get(
+            self, **self.conan_data["sources"][self.version], strip_root=True
+        )  # pylint: disable=no-member
 
     def generate(self):
         tc = CMakeToolchain(self)
         tc.cppstd = default_cppstd(self)
 
         tc.variables["Python_EXECUTABLE"] = Path(sys.executable).as_posix()
+        tc.variables["Python3_EXECUTABLE"] = Path(sys.executable).as_posix()
 
         tc.variables["OCIO_BUILD_PYTHON"] = True
         tc.variables["CMAKE_VERBOSE_MAKEFILE"] = True
@@ -227,7 +239,9 @@ class OpenColorIOConan(ConanFile):
                 copy(self, f"{tool}*", src=bin_dir, dst=tools_dir)
 
         if self.settings.os == "Windows":  # pylint: disable=no-member
-            ocio_sp_folder = Path(self.package_folder) / "lib" / "site-packages"
+            ocio_sp_folder = (
+                Path(self.package_folder) / "lib" / "site-packages" / "PyOpenColorIO"
+            )
             copy(self, "*PyOpenColorIO*", src=ocio_sp_folder, dst=py_package_folder)
         else:
             ocio_lib_folder = Path(self.package_folder) / "lib"
@@ -247,7 +261,9 @@ class OpenColorIOConan(ConanFile):
         self.cpp_info.libs = ["OpenColorIO"]
 
         if is_apple_os(self):
-            self.cpp_info.frameworks.extend(["Foundation", "IOKit", "ColorSync", "CoreGraphics"])
+            self.cpp_info.frameworks.extend(
+                ["Foundation", "IOKit", "ColorSync", "CoreGraphics"]
+            )
             if Version(self.version) == "2.1.0":
                 self.cpp_info.frameworks.extend(["Carbon", "CoreFoundation"])
 
