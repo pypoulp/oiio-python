@@ -11,7 +11,7 @@ and need precise control over their paths and dependencies.
 import subprocess
 from pathlib import Path
 
-project = Path(__file__).parent.resolve()
+project = Path(__file__).parent.parent.resolve()
 
 
 def check_and_add_rpath(binary_path, rpath):
@@ -35,9 +35,7 @@ def check_and_add_rpath(binary_path, rpath):
         if rpath in result.stdout:
             print(f"RPATH '{rpath}' already exists in {binary_path}")
         else:
-            subprocess.run(
-                ["install_name_tool", "-add_rpath", rpath, str(binary_path)], check=True
-            )
+            subprocess.run(["install_name_tool", "-add_rpath", rpath, str(binary_path)], check=True)
             print(f"Added RPATH '{rpath}' to {binary_path}")
     except subprocess.CalledProcessError as e:
         print(f"Error checking or adding RPATH: {e}")
@@ -57,9 +55,7 @@ def update_rpath_references(libs_dir, target_names):
     libs_dir = Path(libs_dir)
     for dylib in libs_dir.glob("*.dylib"):
         try:
-            result = subprocess.run(
-                ["otool", "-L", str(dylib)], capture_output=True, text=True, check=True
-            )
+            result = subprocess.run(["otool", "-L", str(dylib)], capture_output=True, text=True, check=True)
             for line in result.stdout.splitlines():
                 for target_name in target_names:
                     if target_name in line:
