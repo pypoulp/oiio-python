@@ -118,7 +118,7 @@ Although the primary target is automated builds on GitHub Actions, you can also 
     # If you want to build the static variant:
     export OIIO_STATIC=1
     # Set Deployment target according to your macOS version
-    export MACOSX_DEPLOYMENT_TARGET=10.13  # For x86_64 builds
+    export MACOSX_DEPLOYMENT_TARGET=10.15  # For x86_64 builds
     export MACOSX_DEPLOYMENT_TARGET=14.0  # For arm64 builds
     # Set Project root directory to the root of the repository
     export PROJECT_ROOT="/path/to/oiio-python"
@@ -157,6 +157,8 @@ Although the primary target is automated builds on GitHub Actions, you can also 
 2. Install Docker and build:
 
     ```bash
+    # If building on musl (Alpine) Linux, set the following environment variable:
+    export MUSLLINUX_BUILD=1
     export CIBW_ENVIRONMENT="OIIO_STATIC=1"  # For the static version
     # Optional: Specify target docker image / platform
     export CIBW_BUILD="*manylinux_x86*"

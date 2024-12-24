@@ -57,7 +57,12 @@ class LibtiffConan(ConanFile):
         cmake_layout(self, src_folder="src")
 
     def requirements(self):
-        self.requires("libjpeg-turbo/3.0.4")
+
+        if os.getenv("MUSLLINUX_BUILD") == "1":
+            self.requires("libjpeg/9e")
+        else:
+            self.requires("libjpeg-turbo/3.0.4")
+
         self.requires("zlib/[>=1.2.11 <2]")
         self.requires("libdeflate/1.19")
         self.requires("xz_utils/[>=5.4.5 <6]")
@@ -78,9 +83,7 @@ class LibtiffConan(ConanFile):
         tc.variables["libdeflate"] = True
         tc.variables["zstd"] = True
         tc.variables["webp"] = True
-        tc.variables["lerc"] = (
-            False  # TODO: add lerc support for libtiff versions >= 4.3.0
-        )
+        tc.variables["lerc"] = False  # TODO: add lerc support for libtiff versions >= 4.3.0
         # Disable tools, test, contrib, man & html generation
         tc.variables["tiff-tools"] = False
         tc.variables["tiff-tests"] = False
@@ -147,9 +150,7 @@ class LibtiffConan(ConanFile):
         self.cpp_info.set_property("cmake_find_mode", "both")
         self.cpp_info.set_property("cmake_file_name", "TIFF")
         self.cpp_info.set_property("cmake_target_name", "TIFF::TIFF")
-        self.cpp_info.set_property(
-            "pkg_config_name", f"libtiff-{Version(self.version).major}"
-        )
+        self.cpp_info.set_property("pkg_config_name", f"libtiff-{Version(self.version).major}")
         suffix = "d" if is_msvc(self) and self.settings.build_type == "Debug" else ""
         if self.options.cxx:
             self.cpp_info.libs.append(f"tiffxx{suffix}")
@@ -158,10 +159,16 @@ class LibtiffConan(ConanFile):
             self.cpp_info.system_libs.append("m")
 
         self.cpp_info.requires = []
-        self.cpp_info.requires.append("zlib::zlib")
+
         self.cpp_info.requires.append("libdeflate::libdeflate")
         self.cpp_info.requires.append("xz_utils::xz_utils")
-        self.cpp_info.requires.append("libjpeg-turbo::jpeg")
+        # Dependencies
+        if os.getenv("MUSLLINUX_BUILD") == "1":
+            self.cpp_info.requires.append("libjpeg::libjpeg")
+        else:
+            self.cpp_info.requires.append("libjpeg-turbo::libjpeg-turbo")
+
+        self.cpp_info.requires.append("zlib::zlib")
         self.cpp_info.requires.append("jbig::jbig")
         self.cpp_info.requires.append("zstd::zstd")
         self.cpp_info.requires.append("libwebp::libwebp")

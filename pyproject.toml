@@ -17,9 +17,6 @@ skip = [
   "*-manylinux_i686", # Skip 32-bit builds
 ]
 test-command = "python {project}/test.py"
-manylinux-x86_64-image = "quay.io/pypa/manylinux_2_28_x86_64"
-manylinux-aarch64-image = "quay.io/pypa/manylinux_2_28_aarch64"
-musllinux-x86_64-image = "quay.io/pypa/musllinux_1_2_x86_64"
 
 
 [tool.cibuildwheel.macos]

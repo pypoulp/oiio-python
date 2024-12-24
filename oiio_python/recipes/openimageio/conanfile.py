@@ -54,6 +54,11 @@ class OpenImageIOConan(ConanFile):
         if self.settings.os == "Windows":  # pylint: disable=no-member
             del self.options.fPIC
 
+        if os.getenv("MUSLLINUX_BUILD") == "1":
+            # Meson build fails on musllinux
+            self.options["freetype"].with_png = False
+            self.options["freetype"].with_brotli = False
+
     def configure(self):
         if self.options.shared:
             self.options.rm_safe("fPIC")
@@ -66,7 +71,10 @@ class OpenImageIOConan(ConanFile):
         self.requires("libtiff/4.7.0")
         self.requires("imath/3.1.9", transitive_headers=True)
         self.requires("openexr/3.3.1")
-        self.requires("libjpeg-turbo/3.0.4")
+        if os.getenv("MUSLLINUX_BUILD") == "1":
+            self.requires("libjpeg/9e")
+        else:
+            self.requires("libjpeg-turbo/3.0.4")
         self.requires("pugixml/1.14")
         self.requires("libsquish/1.15")
         self.requires("tsl-robin-map/1.2.1")
@@ -74,7 +82,7 @@ class OpenImageIOConan(ConanFile):
         # Optional libraries
         self.requires("libuhdr/1.3.0")
         self.requires("libpng/1.6.44")
-        self.requires("freetype/2.13.3")
+        self.requires("freetype/2.13.0")
         self.requires("hdf5/1.14.3")
         self.requires("opencolorio/2.4.0")
         # self.requires("opencv/4.8.1")
@@ -96,9 +104,7 @@ class OpenImageIOConan(ConanFile):
         if self.settings.compiler.cppstd:  # pylint: disable=no-member
             check_min_cppstd(self, 17)
         if is_msvc(self) and is_msvc_static_runtime(self) and self.options.shared:
-            raise ConanInvalidConfiguration(
-                "Building shared library with static runtime is not supported!"
-            )
+            raise ConanInvalidConfiguration("Building shared library with static runtime is not supported!")
 
     def layout(self):
         cmake_layout(self, src_folder="src")
@@ -115,9 +121,7 @@ class OpenImageIOConan(ConanFile):
 
         tc.variables["Python_EXECUTABLE"] = Path(sys.executable).as_posix()
         tc.variables["USE_PYTHON"] = True
-        tc.variables["PYTHON_SITE_DIR"] = (
-            Path(__file__).parents[2] / "OpenImageIO"
-        ).as_posix()
+        tc.variables["PYTHON_SITE_DIR"] = (Path(__file__).parents[2] / "OpenImageIO").as_posix()
         tc.variables["CMAKE_DEBUG_POSTFIX"] = ""  # Needed for 2.3.x.x+ versions
         tc.variables["OIIO_BUILD_TOOLS"] = self.options.with_tools
         tc.variables["OIIO_BUILD_TESTS"] = False
@@ -131,10 +135,8 @@ class OpenImageIOConan(ConanFile):
         # Conan is normally not used for testing, so fixing this option to not build the tests
         tc.variables["BUILD_TESTING"] = False
         # OIIO CMake files are patched to check USE_* flags to require or not use dependencies
-        tc.variables["USE_JPEGTURBO"] = True
-        tc.variables["USE_JPEG"] = (
-            True  # Needed for jpeg.imageio plugin, libjpeg/libjpeg-turbo selection still works
-        )
+        tc.variables["USE_JPEGTURBO"] = os.getenv("MUSLLINUX_BUILD") != "1"
+        tc.variables["USE_JPEG"] = True  # Needed for jpeg.imageio plugin, libjpeg/libjpeg-turbo selection still works
         tc.variables["USE_HDF5"] = True
         tc.variables["USE_OPENCOLORIO"] = True
         tc.variables["USE_OPENCV"] = False
@@ -281,7 +283,10 @@ class OpenImageIOConan(ConanFile):
             "libuhdr::libuhdr",
         ]
 
-        open_image_io.requires.append("libjpeg-turbo::libjpeg-turbo")
+        if os.getenv("MUSLLINUX_BUILD") == "1":
+            self.cpp_info.requires.append("libjpeg::libjpeg")
+        else:
+            self.cpp_info.requires.append("libjpeg-turbo::libjpeg-turbo")
         open_image_io.requires.append("libpng::libpng")
         open_image_io.requires.append("freetype::freetype")
         open_image_io.requires.append("hdf5::hdf5")

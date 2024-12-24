@@ -26,7 +26,8 @@ install_musllinux() {
     # Update Perl List::Util module using cpan
     cpan -fi List::Util
     # Add libatomic
-    apk add --no-cache libatomic libatomic_ops-dev libatomic_ops-static
+    apk add --no-cache libatomic libatomic_ops-dev libatomic_ops-static 
+    apk add --no-cache ninja ninja-build
 }
 
 # Detect the environment: Check for presence of apk or yum
