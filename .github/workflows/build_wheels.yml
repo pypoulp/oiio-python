@@ -25,7 +25,7 @@ jobs:
       - name: Set MACOSX_DEPLOYMENT_TARGET for macOS x86_64
         if: runner.os == 'macOS' && matrix.os == 'macos-13'
         run: |
-          echo "MACOSX_DEPLOYMENT_TARGET=10.13" >> $GITHUB_ENV
+          echo "MACOSX_DEPLOYMENT_TARGET=10.15" >> $GITHUB_ENV
           echo "CIBW_PLATFORM=macos" >> $GITHUB_ENV
 
       - name: Set MACOSX_DEPLOYMENT_TARGET for macOS arm64
