@@ -39,6 +39,12 @@ def build_dependencies() -> None:
     conan_install_package(libuhdr_dep_dir, libuhdr_version, profile=profile_name)
     build_cleanup(libuhdr_dep_dir)
 
+    # libjxl
+    libuhdr_dep_dir = project / "oiio_python" / "recipes" / "dependencies" / "libjxl"
+    libuhdr_version = "0.10.2"
+    conan_install_package(libuhdr_dep_dir, libuhdr_version, profile=profile_name)
+    build_cleanup(libuhdr_dep_dir)
+
 
 def _main() -> None:
     python_exe = sys.executable

@@ -132,17 +132,12 @@ def relink_and_delocate():
             if not path.is_file():
                 raise FileNotFoundError(f"Required file '{path}' does not exist.")
 
+        all_dylib = list(libs_dir.glob("*.dylib"))
+
         # Update RPATH references
         update_rpath_references(
             libs_dir,
-            [
-                "libtbb",
-                "libtbbmalloc",
-                "libtbbmalloc_proxy",
-                "libOpenImageIO",
-                "libOpenColorIO",
-                "libOpenImageIO_Util",
-            ],
+            all_dylib,
         )
 
         # Ensure LC_RPATH for all binaries

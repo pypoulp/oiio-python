@@ -15,6 +15,7 @@ from conan.tools.files import (
     get,
     rm,
     rmdir,
+    replace_in_file,
 )
 from conan.tools.microsoft import is_msvc, is_msvc_static_runtime
 
@@ -59,19 +60,32 @@ class OpenImageIOConan(ConanFile):
             self.options["freetype"].with_png = False
             self.options["freetype"].with_brotli = False
 
+        if os.getenv("OIIO_STATIC") != "1":
+            self.options.with_tools = False
+            self.options["libraw"].shared = True
+            self.options["libheif"].shared = True
+
     def configure(self):
         if self.options.shared:
             self.options.rm_safe("fPIC")
 
+    @property
+    def dont_use_jpeg_turbo(self):
+        if os.getenv("MUSLLINUX_BUILD") == "1":
+            return True
+        elif os.getenv("OIIO_STATIC") == "1" and self.settings.os in ["Linux", "FreeBSD"]:
+            return True
+        return False
+
     def requirements(self):
         # Required libraries
-        self.requires("libjxl/0.10.3")
+        self.requires("libjxl/0.10.2")
         self.requires("zlib/[>=1.2.11 <2]")
         self.requires("pybind11/2.13.6")
         self.requires("libtiff/4.7.0")
         self.requires("imath/3.1.9", transitive_headers=True)
         self.requires("openexr/3.3.1")
-        if os.getenv("MUSLLINUX_BUILD") == "1":
+        if self.dont_use_jpeg_turbo:
             self.requires("libjpeg/9e")
         else:
             self.requires("libjpeg-turbo/3.0.4")
@@ -116,9 +130,10 @@ class OpenImageIOConan(ConanFile):
     def generate(self):
         tc = CMakeToolchain(self)
         # CMake options
-        if self.settings.os == "Linux":
-            tc.variables["DCOMPILER_SUPPORTS_ATOMIC_WITHOUT_LIBATOMIC_EXITCODE"] = 0
+        # if self.settings.os == "Linux":
+        #     tc.variables["DCOMPILER_SUPPORTS_ATOMIC_WITHOUT_LIBATOMIC_EXITCODE"] = 0
 
+        print(Path(sys.executable).as_posix())
         tc.variables["Python_EXECUTABLE"] = Path(sys.executable).as_posix()
         tc.variables["Python3_EXECUTABLE"] = Path(sys.executable).as_posix()
 
@@ -135,12 +150,12 @@ class OpenImageIOConan(ConanFile):
         tc.variables["BUILD_MISSING_FMT"] = False
         # Conan is normally not used for testing, so fixing this option to not build the tests
         tc.variables["BUILD_TESTING"] = False
-        tc.variables["USE_JPEGTURBO"] = os.getenv("MUSLLINUX_BUILD") != "1"
+        tc.variables["USE_JPEGTURBO"] = not self.dont_use_jpeg_turbo
         tc.variables["USE_JPEG"] = True  # Needed for jpeg.imageio plugin, libjpeg/libjpeg-turbo selection still works
         tc.variables["USE_HDF5"] = True
         tc.variables["USE_OPENCOLORIO"] = True
         tc.variables["USE_OPENCV"] = False
-        tc.variables["USE_TBB"] = True
+        tc.variables["USE_TBB"] = False
         tc.variables["USE_DCMTK"] = False
         tc.variables["USE_FFMPEG"] = False
         tc.variables["USE_FIELD3D"] = False
@@ -219,6 +234,7 @@ class OpenImageIOConan(ConanFile):
         if self.settings.os != "Windows":  # pylint: disable=no-member
             lib_folder = Path(self.package_folder) / "lib"
             copy(self, "*OpenImageIO*", src=lib_folder, dst=py_lib_folder)
+            copy(self, "libOpenImageIO*", src=lib_folder, dst=py_lib_folder)
 
         if os.getenv("OIIO_STATIC") != "1":
             # Copy tools
@@ -243,6 +259,22 @@ class OpenImageIOConan(ConanFile):
                 else:
                     tbb_lib_folder = Path(dep.package_folder) / "lib"
                     copy(self, "*libtbb.*", src=tbb_lib_folder, dst=py_lib_folder)
+
+            if os.getenv("OIIO_STATIC") != "1":
+                if "raw" in str(dep):
+                    if self.settings.os == "Windows":
+                        raw_lib_folder = Path(dep.package_folder) / "bin"
+                        copy(self, "*raw.*", src=raw_lib_folder, dst=py_lib_folder)
+                    else:
+                        raw_lib_folder = Path(dep.package_folder) / "lib"
+                        copy(self, "*raw.*", src=raw_lib_folder, dst=py_lib_folder)
+                if "heif" in str(dep):
+                    if self.settings.os == "Windows":
+                        heif_lib_folder = Path(dep.package_folder) / "bin"
+                        copy(self, "*heif.*", src=heif_lib_folder, dst=py_lib_folder)
+                    else:
+                        heif_lib_folder = Path(dep.package_folder) / "lib"
+                        copy(self, "*heif.*", src=heif_lib_folder, dst=py_lib_folder)
 
     @staticmethod
     def _conan_comp(name):
@@ -288,7 +320,7 @@ class OpenImageIOConan(ConanFile):
             "libuhdr::libuhdr",
         ]
 
-        if os.getenv("MUSLLINUX_BUILD") == "1":
+        if self.dont_use_jpeg_turbo:
             self.cpp_info.requires.append("libjpeg::libjpeg")
         else:
             self.cpp_info.requires.append("libjpeg-turbo::libjpeg-turbo")
@@ -306,6 +338,7 @@ class OpenImageIOConan(ConanFile):
         # open_image_io.requires.append("openvdb::openvdb")
         open_image_io.requires.append("ptex::ptex")
         open_image_io.requires.append("libwebp::libwebp")
+
         if self.settings.os in ["Linux", "FreeBSD"]:
             open_image_io.system_libs.extend(["dl", "m", "pthread"])
 

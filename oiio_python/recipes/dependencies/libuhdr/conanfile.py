@@ -8,9 +8,7 @@ from conan.tools.files import apply_conandata_patches, copy, get, rmdir
 
 class LibultrahdrConan(ConanFile):
     name = "libuhdr"
-    description = (
-        "Library for storing and distributing HDR images using gain map technology"
-    )
+    description = "Library for storing and distributing HDR images using gain map technology"
     license = "Apache-2.0"
     url = "https://github.com/google/libultrahdr"
     settings = "os", "arch", "compiler", "build_type"
@@ -43,8 +41,16 @@ class LibultrahdrConan(ConanFile):
     def layout(self):
         cmake_layout(self, src_folder="src")
 
-    def requirements(self):
+    @property
+    def dont_use_jpeg_turbo(self):
         if os.getenv("MUSLLINUX_BUILD") == "1":
+            return True
+        elif os.getenv("OIIO_STATIC") == "1" and self.settings.os in ["Linux", "FreeBSD"]:
+            return True
+        return False
+
+    def requirements(self):
+        if self.dont_use_jpeg_turbo:
             self.requires("libjpeg/9e")
         else:
             self.requires("libjpeg-turbo/3.0.4")
@@ -112,7 +118,7 @@ class LibultrahdrConan(ConanFile):
         self.cpp_info.libdirs = ["lib"]
 
         # Dependencies
-        if os.getenv("MUSLLINUX_BUILD") == "1":
+        if self.dont_use_jpeg_turbo:
             self.cpp_info.requires = ["libjpeg::libjpeg"]
         else:
             self.cpp_info.requires = ["libjpeg-turbo::libjpeg-turbo"]
