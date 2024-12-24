@@ -104,7 +104,9 @@ class OpenImageIOConan(ConanFile):
         if self.settings.compiler.cppstd:  # pylint: disable=no-member
             check_min_cppstd(self, 17)
         if is_msvc(self) and is_msvc_static_runtime(self) and self.options.shared:
-            raise ConanInvalidConfiguration("Building shared library with static runtime is not supported!")
+            raise ConanInvalidConfiguration(
+                "Building shared library with static runtime is not supported!"
+            )
 
     def layout(self):
         cmake_layout(self, src_folder="src")
@@ -121,7 +123,6 @@ class OpenImageIOConan(ConanFile):
 
         tc.variables["Python_EXECUTABLE"] = Path(sys.executable).as_posix()
         tc.variables["USE_PYTHON"] = True
-        tc.variables["PYTHON_SITE_DIR"] = (Path(__file__).parents[2] / "OpenImageIO").as_posix()
         tc.variables["CMAKE_DEBUG_POSTFIX"] = ""  # Needed for 2.3.x.x+ versions
         tc.variables["OIIO_BUILD_TOOLS"] = self.options.with_tools
         tc.variables["OIIO_BUILD_TESTS"] = False
@@ -134,9 +135,10 @@ class OpenImageIOConan(ConanFile):
         tc.variables["BUILD_MISSING_FMT"] = False
         # Conan is normally not used for testing, so fixing this option to not build the tests
         tc.variables["BUILD_TESTING"] = False
-        # OIIO CMake files are patched to check USE_* flags to require or not use dependencies
         tc.variables["USE_JPEGTURBO"] = os.getenv("MUSLLINUX_BUILD") != "1"
-        tc.variables["USE_JPEG"] = True  # Needed for jpeg.imageio plugin, libjpeg/libjpeg-turbo selection still works
+        tc.variables["USE_JPEG"] = (
+            True  # Needed for jpeg.imageio plugin, libjpeg/libjpeg-turbo selection still works
+        )
         tc.variables["USE_HDF5"] = True
         tc.variables["USE_OPENCOLORIO"] = True
         tc.variables["USE_OPENCV"] = False
@@ -201,6 +203,11 @@ class OpenImageIOConan(ConanFile):
         # Copy python bindings & binaries
         py_package_folder = Path(os.environ["OIIO_PKG_DIR"])
         py_package_folder.mkdir(exist_ok=True)
+
+        oiio_lib_folder = Path(self.package_folder) / "lib"
+        oiio_py_folder = list(oiio_lib_folder.glob("py*"))[0]
+        oiio_sp_folder = oiio_py_folder / "site-packages" / "OpenImageIO"
+        copy(self, "*OpenImageIO*", src=oiio_sp_folder, dst=py_package_folder)
 
         if self.settings.os == "Windows":  # pylint: disable=no-member
             py_lib_folder = py_package_folder

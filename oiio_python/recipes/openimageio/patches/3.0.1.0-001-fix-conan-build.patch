@@ -19,7 +19,7 @@
      add_subdirectory (src/iv)
  endif ()
  
-@@ -246,11 +243,19 @@
+@@ -246,11 +243,9 @@
      endforeach ()
  endif ()
  
@@ -28,19 +28,9 @@
 -else ()
 -    message (STATUS "Not building Python bindings: USE_PYTHON=${USE_PYTHON}, Python3_Development_FOUND=${Python3_Development_FOUND}")
 -endif ()
-+if (WIN32)
-+    if (USE_PYTHON AND Python_Development_FOUND AND NOT BUILD_OIIOUTIL_ONLY)
-+        add_subdirectory (src/python)
-+    else ()
-+        message (STATUS "Not building Python bindings: USE_PYTHON=${USE_PYTHON}, Python_Development_FOUND=${Python_Development_FOUND}")
-+    endif ()
-+else ()
-+    if (USE_PYTHON AND Python_Development.Module_FOUND AND NOT BUILD_OIIOUTIL_ONLY)
-+        add_subdirectory (src/python)
-+    else ()
-+        message (STATUS "Not building Python bindings: USE_PYTHON=${USE_PYTHON}, Python_Development_FOUND=${Python_Development_FOUND}")
-+    endif ()
-+endif()
++
++add_subdirectory (src/python)
++
  
  add_subdirectory (src/include)
  if (BUILD_DOCS)
@@ -148,12 +138,38 @@
                            PRINT Python3_VERSION Python3_EXECUTABLE
                                  Python3_LIBRARIES
                                  Python3_Development_FOUND
-@@ -141,7 +143,4 @@
-              RUNTIME DESTINATION ${PYTHON_SITE_DIR} COMPONENT user
-              LIBRARY DESTINATION ${PYTHON_SITE_DIR} COMPONENT user)
+@@ -50,9 +52,9 @@
+     set (PythonInterp3_FIND_VERSION PYTHON_VERSION_FOUND)
+     set (PythonInterp3_FIND_VERSION_MAJOR ${Python3_VERSION_MAJOR})
  
--    install(FILES __init__.py DESTINATION ${PYTHON_SITE_DIR})
--
+-    if (NOT DEFINED PYTHON_SITE_DIR)
+-        set (PYTHON_SITE_DIR "${CMAKE_INSTALL_LIBDIR}/python${PYTHON_VERSION_FOUND}/site-packages/OpenImageIO")
+-    endif ()
++
++    set (PYTHON_SITE_DIR "${CMAKE_INSTALL_LIBDIR}/python${PYTHON_VERSION_FOUND}/site-packages/OpenImageIO")
++
+     message (VERBOSE "    Python site packages dir ${PYTHON_SITE_DIR}")
+     message (VERBOSE "    Python to include 'lib' prefix: ${PYLIB_LIB_PREFIX}")
+     message (VERBOSE "    Python to include SO version: ${PYLIB_INCLUDE_SONAME}")
+@@ -133,15 +135,14 @@
+     # non-python libraries of the same name (which aren't prefixed by "lib"
+     # on Windows).
+     set_target_properties (${target_name} PROPERTIES
+-            LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/python/site-packages
+-            ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/python/site-packages
+-            )
++    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/python/site-packages
++    ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/python/site-packages
++    )
+ 
+     install (TARGETS ${target_name}
+-             RUNTIME DESTINATION ${PYTHON_SITE_DIR} COMPONENT user
+-             LIBRARY DESTINATION ${PYTHON_SITE_DIR} COMPONENT user)
++        RUNTIME DESTINATION ${PYTHON_SITE_DIR} COMPONENT user
++        LIBRARY DESTINATION ${PYTHON_SITE_DIR} COMPONENT user)
+ 
+     install(FILES __init__.py DESTINATION ${PYTHON_SITE_DIR})
+ 
  endmacro ()
 -
 --- src/heif.imageio/CMakeLists.txt

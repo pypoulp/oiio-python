@@ -246,7 +246,7 @@ class OpenColorIOConan(ConanFile):
         else:
             ocio_lib_folder = Path(self.package_folder) / "lib"
             ocio_py_folder = list(ocio_lib_folder.glob("py*"))[0]
-            ocio_sp_folder = ocio_py_folder / "site-packages"
+            ocio_sp_folder = ocio_py_folder / "site-packages" / "PyOpenColorIO"
             copy(self, "*PyOpenColorIO*", src=ocio_sp_folder, dst=py_package_folder)
 
         license_folder = Path(self.package_folder) / "licenses"

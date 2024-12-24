@@ -8,7 +8,9 @@ from conan.tools.files import apply_conandata_patches, copy, get, rmdir
 
 class LibultrahdrConan(ConanFile):
     name = "libuhdr"
-    description = "Library for storing and distributing HDR images using gain map technology"
+    description = (
+        "Library for storing and distributing HDR images using gain map technology"
+    )
     license = "Apache-2.0"
     url = "https://github.com/google/libultrahdr"
     settings = "os", "arch", "compiler", "build_type"

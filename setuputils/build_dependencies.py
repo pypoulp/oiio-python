@@ -8,11 +8,8 @@ from pathlib import Path
 project = Path(__file__).parent.parent.resolve()
 sys.path.insert(0, project.as_posix())
 
-from setuputils.build_utils import (
-    build_cleanup,  # pylint: disable=C0413
-    conan_install_package,
-    conan_profile_ensure,
-)
+from setuputils.build_utils import build_cleanup  # pylint: disable=C0413
+from setuputils.build_utils import conan_install_package, conan_profile_ensure
 
 
 def build_dependencies() -> None:
