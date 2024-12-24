@@ -137,7 +137,16 @@ def relink_and_delocate():
         # Update RPATH references
         update_rpath_references(
             libs_dir,
-            all_dylib,
+            [
+                "libtbb",
+                "libtbbmalloc",
+                "libtbbmalloc_proxy",
+                "libOpenImageIO",
+                "libOpenColorIO",
+                "libOpenImageIO_Util",
+                "libheif",
+                "libraw",
+            ],
         )
 
         # Ensure LC_RPATH for all binaries
