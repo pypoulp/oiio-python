@@ -104,9 +104,7 @@ class OpenImageIOConan(ConanFile):
         if self.settings.compiler.cppstd:  # pylint: disable=no-member
             check_min_cppstd(self, 17)
         if is_msvc(self) and is_msvc_static_runtime(self) and self.options.shared:
-            raise ConanInvalidConfiguration(
-                "Building shared library with static runtime is not supported!"
-            )
+            raise ConanInvalidConfiguration("Building shared library with static runtime is not supported!")
 
     def layout(self):
         cmake_layout(self, src_folder="src")
@@ -122,6 +120,8 @@ class OpenImageIOConan(ConanFile):
             tc.variables["DCOMPILER_SUPPORTS_ATOMIC_WITHOUT_LIBATOMIC_EXITCODE"] = 0
 
         tc.variables["Python_EXECUTABLE"] = Path(sys.executable).as_posix()
+        tc.variables["Python3_EXECUTABLE"] = Path(sys.executable).as_posix()
+
         tc.variables["USE_PYTHON"] = True
         tc.variables["CMAKE_DEBUG_POSTFIX"] = ""  # Needed for 2.3.x.x+ versions
         tc.variables["OIIO_BUILD_TOOLS"] = self.options.with_tools
@@ -136,9 +136,7 @@ class OpenImageIOConan(ConanFile):
         # Conan is normally not used for testing, so fixing this option to not build the tests
         tc.variables["BUILD_TESTING"] = False
         tc.variables["USE_JPEGTURBO"] = os.getenv("MUSLLINUX_BUILD") != "1"
-        tc.variables["USE_JPEG"] = (
-            True  # Needed for jpeg.imageio plugin, libjpeg/libjpeg-turbo selection still works
-        )
+        tc.variables["USE_JPEG"] = True  # Needed for jpeg.imageio plugin, libjpeg/libjpeg-turbo selection still works
         tc.variables["USE_HDF5"] = True
         tc.variables["USE_OPENCOLORIO"] = True
         tc.variables["USE_OPENCV"] = False
