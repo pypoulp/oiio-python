@@ -27,5 +27,5 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name:  cibw-wheels-${{ matrix.distrib }}-${{ matrix.linking }}-${{ strategy.job-index }}
+          name:  cibw-${{ matrix.linking }}-wheels-${{ matrix.distrib }}-${{ strategy.job-index }}
           path: ./wheelhouse/*.whl
