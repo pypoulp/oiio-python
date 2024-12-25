@@ -41,17 +41,34 @@ This project avoids using the `openimageio` package name because the ASWF may re
 
 ## **What's Included**
 
-This package integrates the following features and dependencies:
+The goal is to enable as many features as possible to make the wheel flexible, while keeping the package size reasonable.
 
-- **[OpenColorIO](https://opencolorio.org/)**: Python bindings included for seamless color management.
+OpenImageIO wheels are built with the following features enabled:
+
+- **[OpenColorIO](https://opencolorio.org/)**: With Python bindings included for seamless color management.
 - **LibRaw**: Adds RAW image support.
-- **Freetype**: Enables text rendering.
+- **OpenEXR**: High dynamic range image support.
+- **Ptex**: Ptex texture mapping support.
+- **OneTBB**: Multithreading support.
+- **FreeType**: Enables text rendering.
 - **TBB**: Multithreading support.
-- **LibWebP**: WebP image support.
-- **LibPNG** and **LibJPEG/OpenJPEG**: For PNG and JPEG support.
-- **Giflib**: GIF support.
-- **HDF5**: High-performance data storage support.
+- **libwebp**: WebP image support.
+- **libpng**: PNG image support.
+- **libjpeg**: Support with libjpeg on musllinux, libjpeg-turbo on other platforms.
+- **giflib**: GIF support.
+- **hdf5**: HDF5 data storage support.
 - **Ptex**: Ptex texture mapping.
+- **libheif**: HEIF/AVIF image support.
+- **libtiff**: TIFF image support.
+- **libjxl**: JPEG XL image support.
+- **libultrahdr**: Adds support for UltraHDR images.
+- **OpenJPEG**: JPEG 2000 support.
+
+*FFmpeg is not included due to potential licensing issues and package size.*
+
+*DICOM support is also not enabled because of large package size.*
+
+*Volumetric format support like **OpenVDB** and **Field3D** are not included for now but could be in the future if requested.*
 
 ---
 
@@ -79,7 +96,7 @@ Third-party libraries are licensed under their respective licenses. Copies of th
 
 #### Statically Linked Libraries in Binary Wheels
 
-The binary wheels may include statically linked libraries:
+The binary wheels may include LGPL statically linked libraries, including:
 
 - **[LibRaw](https://github.com/LibRaw/LibRaw)** (LGPL 2.1)
 - **[LibHeif](https://github.com/strukturag/libheif)** (LGPL 3.0)
@@ -150,7 +167,7 @@ Although the primary target is automated builds on GitHub Actions, you can also 
 
 5. If not building with cibuildwheel, you'll need to manually "repair" the wheel with delocate after build:
 
-6. run provided `macos_fix_shared_libs.py`
+6. run provided `setuputils/macos_fix_shared_libs.py`
 
 7. then use `delocate-wheel` to copy the shared libraries into the wheel:
 
@@ -179,7 +196,7 @@ Although the primary target is automated builds on GitHub Actions, you can also 
 3. To build for the current Python version and distribution:
 
     - Ensure Perl is installed (required for dependencies).
-    - Use `linux_before_all.sh` if needed.
+    - Use `setuputils/linux_before_all.sh` if needed.
 
 
         ```bash
