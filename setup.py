@@ -108,7 +108,7 @@ if __name__ == "__main__":
         scripts = {}
         include_data = False
         zip_safe = True
-        license_files = (("LICENSE-LGPL", "LICENSE"),)
+        license_files = ["LICENSE-LGPL", "LICENSE"]
 
     package_name = "oiio-static-python" if static_build else "oiio-python"
 
@@ -117,7 +117,7 @@ if __name__ == "__main__":
     setup(
         name=package_name,
         version="3.0.1.0.1",
-        license_files=license_files,
+        license_files=tuple(license_files),
         package_dir={"": "oiio_python"},
         packages=find_packages(where="oiio_python"),
         package_data=package_data,
