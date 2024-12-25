@@ -11,7 +11,10 @@ def _run_tool(tool_name: str) -> None:
     ocio_bin_path = HERE
     env = os.environ.copy()
     env["PATH"] = os.environ["PATH"] + os.pathsep + str(ocio_bin_path)
-    subprocess.run([str(tool_path)] + sys.argv[1:], check=True, env=env)
+    try:
+        subprocess.run([str(tool_path)] + sys.argv[1:], check=True, env=env)
+    except subprocess.CalledProcessError as e:
+        print(f"Error: {tool_name} failed with return code {e.returncode}.")
 
 
 def ocioarchive() -> None:
