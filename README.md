@@ -1,13 +1,14 @@
 # **oiio-python**
-[![Build Static Multiplatform Wheels](https://github.com/pypoulp/oiio-python/actions/workflows/build_static_wheels.yml/badge.svg)](https://github.com/pypoulp/oiio-python/actions/workflows/build_static_wheels.yml)
-[![Build Multiplatform Wheels](https://github.com/pypoulp/oiio-python/actions/workflows/build_wheels.yml/badge.svg)](https://github.com/pypoulp/oiio-python/actions/workflows/build_wheels.yml)
-[![Build Linux Wheels](https://github.com/pypoulp/oiio-python/actions/workflows/build_linux_wheels.yml/badge.svg)](https://github.com/pypoulp/oiio-python/actions/workflows/build_linux_wheels.yml)
 
 **🐍 OpenImageIO on wheels!**
 
 This project provides (unofficial) multiplatform wheels for [OpenImageIO](https://github.com/AcademySoftwareFoundation/OpenImageIO) Python bindings, simplifying installation and integration into Python projects.
 
 Check [types-oiio-python](https://github.com/pypoulp/types-oiio-python) if you want type hints & auto-completion for oiio-python.
+
+[![Build Static Multiplatform Wheels](https://github.com/pypoulp/oiio-python/actions/workflows/build_static_wheels.yml/badge.svg)](https://github.com/pypoulp/oiio-python/actions/workflows/build_static_wheels.yml)
+[![Build Multiplatform Wheels](https://github.com/pypoulp/oiio-python/actions/workflows/build_wheels.yml/badge.svg)](https://github.com/pypoulp/oiio-python/actions/workflows/build_wheels.yml)
+[![Build Linux Wheels](https://github.com/pypoulp/oiio-python/actions/workflows/build_linux_wheels.yml/badge.svg)](https://github.com/pypoulp/oiio-python/actions/workflows/build_linux_wheels.yml)
 
 ---
 
