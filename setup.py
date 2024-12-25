@@ -21,7 +21,7 @@ class BinaryDistribution(Distribution):
 
 if __name__ == "__main__":
 
-    license_files_paths = list((here / "licenses").glob("*"))*
+    license_files_paths = list((here / "licenses").glob("*"))
     license_files = [license_file_path.as_posix() for license_file_path in license_files_paths]
 
     oiio_static = os.getenv("OIIO_STATIC")
