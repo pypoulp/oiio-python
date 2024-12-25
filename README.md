@@ -72,18 +72,18 @@ This project builds two variants of the OpenImageIO Python bindings:
 Code in this repository is licensed under the [Apache 2.0 License](LICENSE) to match the original OpenImageIO license.  
 Third-party libraries are licensed under their respective licenses. Copies of these licenses can be found in the [licenses](licenses) folder.
 
-### Statically Linked Libraries in Binary Wheels
+#### Statically Linked Libraries in Binary Wheels
 
 The binary wheels may include statically linked libraries:
 
 - **[LibRaw](https://github.com/LibRaw/LibRaw)** (LGPL 2.1)
 - **[LibHeif](https://github.com/strukturag/libheif)** (LGPL 3.0)
 
-### Licensing for Versions Before 3.0.1.0
+#### Licensing for Versions Before 3.0.1.0
 
 Before version 3.0.1.0, the distributed wheels are licensed under the [LGPL 3.0 License](LICENSE-LGPL).
 
-### Licensing for Versions 3.0.1.0 and Above
+#### Licensing for Versions 3.0.1.0 and Above
 
 For version 3.0.1.0 and above:
 
