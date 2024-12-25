@@ -21,13 +21,18 @@ class BinaryDistribution(Distribution):
 
 if __name__ == "__main__":
 
+    license_files_paths = list((here / "licenses").glob("*"))*
+    license_files = [license_file_path.as_posix() for license_file_path in license_files_paths]
+
     oiio_static = os.getenv("OIIO_STATIC")
     static_build = str(oiio_static) == "1"
 
     print("=" * 80)
     if static_build:
+        license_files.append("LICENSE-LGPL")
         print("Building static libraries.")
     else:
+        license_files.append("LICENSE")
         print("Building shared libraries.")
     print("=" * 80)
 
@@ -103,6 +108,7 @@ if __name__ == "__main__":
         scripts = {}
         include_data = False
         zip_safe = True
+        license_files = (("LICENSE-LGPL", "LICENSE"),)
 
     package_name = "oiio-static-python" if static_build else "oiio-python"
 
@@ -111,7 +117,7 @@ if __name__ == "__main__":
     setup(
         name=package_name,
         version="3.0.1.0.1",
-        license_files=("LICENSE-LGPL", "LICENSE"),
+        license_files=license_files,
         package_dir={"": "oiio_python"},
         packages=find_packages(where="oiio_python"),
         package_data=package_data,

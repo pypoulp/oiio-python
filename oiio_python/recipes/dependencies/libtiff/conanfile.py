@@ -60,7 +60,10 @@ class LibtiffConan(ConanFile):
     def dont_use_jpeg_turbo(self):
         if os.getenv("MUSLLINUX_BUILD") == "1":
             return True
-        elif os.getenv("OIIO_STATIC") == "1" and self.settings.os in ["Linux", "FreeBSD"]:
+        elif os.getenv("OIIO_STATIC") == "1" and self.settings.os in [
+            "Linux",
+            "FreeBSD",
+        ]:
             return True
         return False
 
@@ -91,7 +94,9 @@ class LibtiffConan(ConanFile):
         tc.variables["libdeflate"] = True
         tc.variables["zstd"] = True
         tc.variables["webp"] = True
-        tc.variables["lerc"] = False  # TODO: add lerc support for libtiff versions >= 4.3.0
+        tc.variables["lerc"] = (
+            False  # TODO: add lerc support for libtiff versions >= 4.3.0
+        )
         # Disable tools, test, contrib, man & html generation
         tc.variables["tiff-tools"] = False
         tc.variables["tiff-tests"] = False
@@ -158,7 +163,9 @@ class LibtiffConan(ConanFile):
         self.cpp_info.set_property("cmake_find_mode", "both")
         self.cpp_info.set_property("cmake_file_name", "TIFF")
         self.cpp_info.set_property("cmake_target_name", "TIFF::TIFF")
-        self.cpp_info.set_property("pkg_config_name", f"libtiff-{Version(self.version).major}")
+        self.cpp_info.set_property(
+            "pkg_config_name", f"libtiff-{Version(self.version).major}"
+        )
         suffix = "d" if is_msvc(self) and self.settings.build_type == "Debug" else ""
         if self.options.cxx:
             self.cpp_info.libs.append(f"tiffxx{suffix}")

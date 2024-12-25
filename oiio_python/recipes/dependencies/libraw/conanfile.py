@@ -54,7 +54,10 @@ class LibRawConan(ConanFile):
     def dont_use_jpeg_turbo(self):
         if os.getenv("MUSLLINUX_BUILD") == "1":
             return True
-        elif os.getenv("OIIO_STATIC") == "1" and self.settings.os in ["Linux", "FreeBSD"]:
+        elif os.getenv("OIIO_STATIC") == "1" and self.settings.os in [
+            "Linux",
+            "FreeBSD",
+        ]:
             return True
         return False
 
@@ -84,7 +87,9 @@ class LibRawConan(ConanFile):
         tc = CMakeToolchain(self)
         tc.variables["RAW_LIB_VERSION_STRING"] = self.version
         tc.variables["LIBRAW_SRC_DIR"] = Path(self.source_folder).as_posix()
-        tc.variables["LIBRAW_BUILD_THREAD_SAFE"] = self.options.get_safe("build_thread_safe", False)
+        tc.variables["LIBRAW_BUILD_THREAD_SAFE"] = self.options.get_safe(
+            "build_thread_safe", False
+        )
         tc.variables["LIBRAW_WITH_JPEG"] = True
         tc.variables["LIBRAW_WITH_LCMS"] = self.options.with_lcms
         tc.variables["LIBRAW_WITH_JASPER"] = self.options.with_jasper
@@ -117,7 +122,9 @@ class LibRawConan(ConanFile):
     def package_info(self):
         self.cpp_info.components["libraw_"].set_property("pkg_config_name", "libraw")
         self.cpp_info.components["libraw_"].libs = ["raw"]
-        self.cpp_info.components["libraw_"].includedirs.append(os.path.join("include", "libraw"))
+        self.cpp_info.components["libraw_"].includedirs.append(
+            os.path.join("include", "libraw")
+        )
 
         if self.settings.os == "Windows":
             self.cpp_info.components["libraw_"].system_libs.append("ws2_32")
@@ -139,9 +146,13 @@ class LibRawConan(ConanFile):
         self.cpp_info.components["libraw_"].requires = requires
 
         if self.options.get_safe("build_thread_safe"):
-            self.cpp_info.components["libraw_r"].set_property("pkg_config_name", "libraw_r")
+            self.cpp_info.components["libraw_r"].set_property(
+                "pkg_config_name", "libraw_r"
+            )
             self.cpp_info.components["libraw_r"].libs = ["raw_r"]
-            self.cpp_info.components["libraw_r"].includedirs.append(os.path.join("include", "libraw"))
+            self.cpp_info.components["libraw_r"].includedirs.append(
+                os.path.join("include", "libraw")
+            )
             if self.settings.os in ["Linux", "FreeBSD"]:
                 self.cpp_info.components["libraw_r"].system_libs.append("pthread")
             self.cpp_info.components["libraw_r"].requires = requires
@@ -149,4 +160,6 @@ class LibRawConan(ConanFile):
         if not self.options.shared and stdcpp_library(self):
             self.cpp_info.components["libraw_"].system_libs.append(stdcpp_library(self))
             if self.options.get_safe("build_thread_safe"):
-                self.cpp_info.components["libraw_r"].system_libs.append(stdcpp_library(self))
+                self.cpp_info.components["libraw_r"].system_libs.append(
+                    stdcpp_library(self)
+                )

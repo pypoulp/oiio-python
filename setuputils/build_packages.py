@@ -62,8 +62,12 @@ def build_packages(build_static_version: bool = False) -> None:
         os.remove(ocio_pkg_dir / "__init__.py")
     # Copy loaders
     if platform.system() == "Windows":
-        shutil.copyfile(loaders_dir / "ocio_loader_win.py", ocio_pkg_dir / "__init__.py")
-        shutil.copyfile(loaders_dir / "oiio_loader_win.py", oiio_pkg_dir / "__init__.py")
+        shutil.copyfile(
+            loaders_dir / "ocio_loader_win.py", ocio_pkg_dir / "__init__.py"
+        )
+        shutil.copyfile(
+            loaders_dir / "oiio_loader_win.py", oiio_pkg_dir / "__init__.py"
+        )
     else:
         shutil.copyfile(loaders_dir / "ocio_loader.py", ocio_pkg_dir / "__init__.py")
         shutil.copyfile(loaders_dir / "oiio_loader.py", oiio_pkg_dir / "__init__.py")
@@ -72,8 +76,16 @@ def build_packages(build_static_version: bool = False) -> None:
         # Copy tool wrappers
         wrappers_dir = project / "oiio_python" / "tool_wrappers"
         if platform.system() == "Windows":
-            shutil.copyfile(wrappers_dir / "oiio_tools_win.py", oiio_pkg_dir / "_tool_wrapper.py")
-            shutil.copyfile(wrappers_dir / "ocio_tools_win.py", ocio_pkg_dir / "_tool_wrapper.py")
+            shutil.copyfile(
+                wrappers_dir / "oiio_tools_win.py", oiio_pkg_dir / "_tool_wrapper.py"
+            )
+            shutil.copyfile(
+                wrappers_dir / "ocio_tools_win.py", ocio_pkg_dir / "_tool_wrapper.py"
+            )
         else:
-            shutil.copyfile(wrappers_dir / "oiio_tools.py", oiio_pkg_dir / "_tool_wrapper.py")
-            shutil.copyfile(wrappers_dir / "ocio_tools.py", ocio_pkg_dir / "_tool_wrapper.py")
+            shutil.copyfile(
+                wrappers_dir / "oiio_tools.py", oiio_pkg_dir / "_tool_wrapper.py"
+            )
+            shutil.copyfile(
+                wrappers_dir / "ocio_tools.py", ocio_pkg_dir / "_tool_wrapper.py"
+            )

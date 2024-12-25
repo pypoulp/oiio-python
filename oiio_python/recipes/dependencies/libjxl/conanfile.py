@@ -1,12 +1,12 @@
 import os
-
 from pathlib import Path
+
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
-from conan.tools.build import cross_building, stdcpp_library, check_min_cppstd
+from conan.tools.build import check_min_cppstd, cross_building, stdcpp_library
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
 from conan.tools.env import VirtualBuildEnv
-from conan.tools.files import copy, get, rmdir, save, rm, replace_in_file
+from conan.tools.files import copy, get, replace_in_file, rm, rmdir, save
 from conan.tools.gnu import PkgConfigDeps
 from conan.tools.microsoft import is_msvc
 from conan.tools.scm import Version
@@ -44,7 +44,12 @@ class LibjxlConan(ConanFile):
     }
 
     def export_sources(self):
-        copy(self, "conan_deps.cmake", self.recipe_folder, os.path.join(self.export_sources_folder, "src"))
+        copy(
+            self,
+            "conan_deps.cmake",
+            self.recipe_folder,
+            os.path.join(self.export_sources_folder, "src"),
+        )
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -87,7 +92,9 @@ class LibjxlConan(ConanFile):
         VirtualBuildEnv(self).generate()
 
         tc = CMakeToolchain(self)
-        tc.variables["CMAKE_PROJECT_LIBJXL_INCLUDE"] = (here / "conan_deps.cmake").as_posix()
+        tc.variables["CMAKE_PROJECT_LIBJXL_INCLUDE"] = (
+            here / "conan_deps.cmake"
+        ).as_posix()
         tc.variables["BUILD_TESTING"] = False
         tc.variables["JPEGXL_STATIC"] = False
         tc.variables["JPEGXL_BUNDLE_LIBPNG"] = False
@@ -110,8 +117,12 @@ class LibjxlConan(ConanFile):
         tc.variables["JPEGXL_WARNINGS_AS_ERRORS"] = False
         tc.variables["JPEGXL_FORCE_NEON"] = False
         tc.variables["JPEGXL_ENABLE_AVX512"] = self.options.get_safe("avx512", False)
-        tc.variables["JPEGXL_ENABLE_AVX512_SPR"] = self.options.get_safe("avx512_spr", False)
-        tc.variables["JPEGXL_ENABLE_AVX512_ZEN4"] = self.options.get_safe("avx512_zen4", False)
+        tc.variables["JPEGXL_ENABLE_AVX512_SPR"] = self.options.get_safe(
+            "avx512_spr", False
+        )
+        tc.variables["JPEGXL_ENABLE_AVX512_ZEN4"] = self.options.get_safe(
+            "avx512_zen4", False
+        )
         if cross_building(self):
             tc.variables["CMAKE_SYSTEM_PROCESSOR"] = str(self.settings.arch)
         # Allow non-cache_variables to be used
@@ -124,7 +135,11 @@ class LibjxlConan(ConanFile):
             tc.variables["JPEGXL_ENABLE_JPEGLI_LIBJPEG"] = False
         # TODO: can hopefully be removed in newer versions
         # https://github.com/libjxl/libjxl/issues/3159
-        if Version(self.version) >= "0.9" and self.settings.build_type == "Debug" and is_msvc(self):
+        if (
+            Version(self.version) >= "0.9"
+            and self.settings.build_type == "Debug"
+            and is_msvc(self)
+        ):
             tc.preprocessor_definitions["JXL_DEBUG_V_LEVEL"] = 1
         tc.generate()
 
@@ -145,19 +160,34 @@ class LibjxlConan(ConanFile):
     def _patch_sources(self):
         # Disable tools, extras and third_party
         save(self, os.path.join(self.source_folder, "tools", "CMakeLists.txt"), "")
-        save(self, os.path.join(self.source_folder, "third_party", "CMakeLists.txt"), "")
+        save(
+            self, os.path.join(self.source_folder, "third_party", "CMakeLists.txt"), ""
+        )
         # FindAtomics.cmake values are set by CMakeToolchain instead
         save(self, os.path.join(self.source_folder, "cmake", "FindAtomics.cmake"), "")
 
         # Allow fPIC to be set by Conan
         replace_in_file(
-            self, os.path.join(self.source_folder, "CMakeLists.txt"), "set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)", ""
+            self,
+            os.path.join(self.source_folder, "CMakeLists.txt"),
+            "set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)",
+            "",
         )
-        for cmake_file in ["jxl.cmake", "jxl_threads.cmake", "jxl_cms.cmake", "jpegli.cmake"]:
+        for cmake_file in [
+            "jxl.cmake",
+            "jxl_threads.cmake",
+            "jxl_cms.cmake",
+            "jpegli.cmake",
+        ]:
             path = os.path.join(self.source_folder, "lib", cmake_file)
             if os.path.exists(path):
                 fpic = "ON" if self.options.get_safe("fPIC", True) else "OFF"
-                replace_in_file(self, path, "POSITION_INDEPENDENT_CODE ON", f"POSITION_INDEPENDENT_CODE {fpic}")
+                replace_in_file(
+                    self,
+                    path,
+                    "POSITION_INDEPENDENT_CODE ON",
+                    f"POSITION_INDEPENDENT_CODE {fpic}",
+                )
 
     def build(self):
         self._patch_sources()
@@ -168,14 +198,23 @@ class LibjxlConan(ConanFile):
     def package(self):
         cmake = CMake(self)
         cmake.install()
-        copy(self, "LICENSE", self.source_folder, os.path.join(self.package_folder, "licenses"))
+        copy(
+            self,
+            "LICENSE",
+            self.source_folder,
+            os.path.join(self.package_folder, "licenses"),
+        )
         rmdir(self, os.path.join(self.package_folder, "lib", "pkgconfig"))
         if self.options.shared:
             rm(self, "*.a", os.path.join(self.package_folder, "lib"))
             rm(self, "*-static.lib", os.path.join(self.package_folder, "lib"))
 
     def _lib_name(self, name):
-        if Version(self.version) < "0.9" and not self.options.shared and self.settings.os == "Windows":
+        if (
+            Version(self.version) < "0.9"
+            and not self.options.shared
+            and self.settings.os == "Windows"
+        ):
             return name + "-static"
         return name
 
@@ -185,9 +224,15 @@ class LibjxlConan(ConanFile):
         # jxl
         self.cpp_info.components["jxl"].set_property("pkg_config_name", "libjxl")
         self.cpp_info.components["jxl"].libs = [self._lib_name("jxl")]
-        self.cpp_info.components["jxl"].requires = ["brotli::brotli", "highway::highway", "lcms::lcms"]
+        self.cpp_info.components["jxl"].requires = [
+            "brotli::brotli",
+            "highway::highway",
+            "lcms::lcms",
+        ]
         if self.options.with_tcmalloc:
-            self.cpp_info.components["jxl"].requires.append("gperftools::tcmalloc_minimal")
+            self.cpp_info.components["jxl"].requires.append(
+                "gperftools::tcmalloc_minimal"
+            )
         if self._atomic_required:
             self.cpp_info.components["jxl"].system_libs.append("atomic")
         if not self.options.shared:
@@ -197,9 +242,14 @@ class LibjxlConan(ConanFile):
 
         # jxl_cms
         if Version(self.version) >= "0.9.0":
-            self.cpp_info.components["jxl_cms"].set_property("pkg_config_name", "libjxl_cms")
+            self.cpp_info.components["jxl_cms"].set_property(
+                "pkg_config_name", "libjxl_cms"
+            )
             self.cpp_info.components["jxl_cms"].libs = [self._lib_name("jxl_cms")]
-            self.cpp_info.components["jxl_cms"].requires = ["lcms::lcms", "highway::highway"]
+            self.cpp_info.components["jxl_cms"].requires = [
+                "lcms::lcms",
+                "highway::highway",
+            ]
             if not self.options.shared:
                 self.cpp_info.components["jxl"].defines.append("JXL_CMS_STATIC_DEFINE")
             if libcxx:
@@ -208,18 +258,28 @@ class LibjxlConan(ConanFile):
         # jxl_dec
         if Version(self.version) < "0.9.0":
             if not self.options.shared:
-                self.cpp_info.components["jxl_dec"].set_property("pkg_config_name", "libjxl_dec")
+                self.cpp_info.components["jxl_dec"].set_property(
+                    "pkg_config_name", "libjxl_dec"
+                )
                 self.cpp_info.components["jxl_dec"].libs = [self._lib_name("jxl_dec")]
-                self.cpp_info.components["jxl_dec"].requires = ["brotli::brotli", "highway::highway", "lcms::lcms"]
+                self.cpp_info.components["jxl_dec"].requires = [
+                    "brotli::brotli",
+                    "highway::highway",
+                    "lcms::lcms",
+                ]
                 if libcxx:
                     self.cpp_info.components["jxl_dec"].system_libs.append(libcxx)
 
         # jxl_threads
-        self.cpp_info.components["jxl_threads"].set_property("pkg_config_name", "libjxl_threads")
+        self.cpp_info.components["jxl_threads"].set_property(
+            "pkg_config_name", "libjxl_threads"
+        )
         self.cpp_info.components["jxl_threads"].libs = [self._lib_name("jxl_threads")]
         if self.settings.os in ["Linux", "FreeBSD"]:
             self.cpp_info.components["jxl_threads"].system_libs = ["pthread"]
         if not self.options.shared:
-            self.cpp_info.components["jxl_threads"].defines.append("JXL_THREADS_STATIC_DEFINE")
+            self.cpp_info.components["jxl_threads"].defines.append(
+                "JXL_THREADS_STATIC_DEFINE"
+            )
         if libcxx:
             self.cpp_info.components["jxl_threads"].system_libs.append(libcxx)

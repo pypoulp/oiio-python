@@ -13,9 +13,9 @@ from conan.tools.files import (
     copy,
     export_conandata_patches,
     get,
+    replace_in_file,
     rm,
     rmdir,
-    replace_in_file,
 )
 from conan.tools.microsoft import is_msvc, is_msvc_static_runtime
 
@@ -73,7 +73,10 @@ class OpenImageIOConan(ConanFile):
     def dont_use_jpeg_turbo(self):
         if os.getenv("MUSLLINUX_BUILD") == "1":
             return True
-        elif os.getenv("OIIO_STATIC") == "1" and self.settings.os in ["Linux", "FreeBSD"]:
+        elif os.getenv("OIIO_STATIC") == "1" and self.settings.os in [
+            "Linux",
+            "FreeBSD",
+        ]:
             return True
         return False
 
