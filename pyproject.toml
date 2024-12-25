@@ -14,13 +14,15 @@ build-frontend = {name = "build"}
 skip = [
   "pp*", # Disable building PyPy wheels on all platforms
   "*-win32", # Skip 32-bit builds
-  "*-manylinux_i686", # Skip 32-bit builds  # "cp38-macosx_arm64", # Skip building for Python 3.8 on Apple Silicon
+  "*-manylinux_i686", # Skip 32-bit builds
 ]
 test-command = "python {project}/test.py"
+
 
 [tool.cibuildwheel.macos]
 before-all = [
   "brew install cmake",
+  "python {project}/setuputils/build_dependencies.py",
 ]
 repair-wheel-command = [
   "export REPAIR_LIBRARY=$PROJECT_ROOT/oiio_python/libs:$DYLD_LIBRARY_PATH",
@@ -29,10 +31,16 @@ repair-wheel-command = [
 
 [tool.cibuildwheel.linux]
 before-all = [
-  "chmod +x {project}/linux_before_all.sh",
-  "bash {project}/linux_before_all.sh",
+  "chmod +x {project}/setuputils/linux_before_all.sh",
+  "bash {project}/setuputils/linux_before_all.sh",
+  "python {project}/setuputils/build_dependencies.py",
 ]
 repair-wheel-command = [
   "export LD_LIBRARY_PATH=/project/oiio_python/libs:$LD_LIBRARY_PATH",
   "auditwheel repair -w {dest_dir} {wheel}",
+]
+
+[tool.cibuildwheel.windows]
+before-all = [
+  "python {project}/setuputils/build_dependencies.py",
 ]

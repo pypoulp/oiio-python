@@ -1,28 +1,35 @@
 # Include specific file types from all subdirectories of 'oiio_python'
 recursive-include oiio_python *.py *.txt *.cpp *.yml *.patch *.md
-
-# Explicitly include files and subdirectories under OpenImageIO and PyOpenColorIO
-recursive-include oiio_python/OpenImageIO *
-recursive-include oiio_python/PyOpenColorIO *
-
-# Include tools and licenses directories under OpenImageIO and PyOpenColorIO
-recursive-include oiio_python/OpenImageIO/tools *
-recursive-include oiio_python/OpenImageIO/licenses *
-recursive-include oiio_python/PyOpenColorIO/tools *
-recursive-include oiio_python/PyOpenColorIO/licenses *
-
-# Exclude specific directories and files
-prune oiio_python/recipes/dependencies/libraw/src
-prune oiio_python/recipes/dependencies/libraw/build
-prune oiio_python/recipes/dependencies/libraw/test_package/build
-
-prune oiio_python/recipes/dependencies/opencolorio/src
-prune oiio_python/recipes/dependencies/opencolorio/build
-prune oiio_python/recipes/dependencies/opencolorio/test_package/build
-
-prune oiio_python/recipes/openimageio/src
-prune oiio_python/recipes/openimageio/build
-prune oiio_python/recipes/openimageio/test_package/build
+recursive-include setuputils *.py
 
 # Add a license file explicitly
 include LICENSE
+include LICENSE-GPL
+recursive-include licenses *
+
+
+# Include specific file types from all subdirectories of 'oiio_python'
+recursive-include oiio_python *.py *.txt *.cpp *.yml *.patch *.md
+
+# Explicitly include files and subdirectories under OpenImageIO and PyOpenColorIO
+recursive-exclude oiio_python/OpenImageIO *
+recursive-exclude oiio_python/PyOpenColorIO *
+
+# Include tools and licenses directories under OpenImageIO and PyOpenColorIO
+recursive-exclude oiio_python/OpenImageIO/tools *
+recursive-exclude oiio_python/OpenImageIO/licenses *
+recursive-exclude oiio_python/PyOpenColorIO/tools *
+recursive-exclude oiio_python/PyOpenColorIO/licenses *
+
+# Exclude specific directories and files
+recursive-exclude oiio_python/recipes/dependencies/libraw/src
+recursive-exclude oiio_python/recipes/dependencies/libraw/build
+recursive-exclude oiio_python/recipes/dependencies/libraw/test_package/build
+
+recursive-exclude oiio_python/recipes/dependencies/opencolorio/src
+recursive-exclude oiio_python/recipes/dependencies/opencolorio/build
+recursive-exclude oiio_python/recipes/dependencies/opencolorio/test_package/build
+
+recursive-exclude oiio_python/recipes/openimageio/src
+recursive-exclude oiio_python/recipes/openimageio/build
+recursive-exclude oiio_python/recipes/openimageio/test_package/build

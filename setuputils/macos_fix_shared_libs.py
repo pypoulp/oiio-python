@@ -11,7 +11,7 @@ and need precise control over their paths and dependencies.
 import subprocess
 from pathlib import Path
 
-here = Path(__file__).parent.resolve()
+project = Path(__file__).parent.parent.resolve()
 
 
 def check_and_add_rpath(binary_path, rpath):
@@ -112,7 +112,7 @@ def relink_and_delocate():
         Exception: For any other unexpected errors.
     """
     try:
-        base_path = here / "oiio_python"
+        base_path = project / "oiio_python"
         libs_dir = base_path / "libs"
         libs_dir.mkdir(parents=True, exist_ok=True)
 
@@ -146,6 +146,8 @@ def relink_and_delocate():
                 "libOpenImageIO",
                 "libOpenColorIO",
                 "libOpenImageIO_Util",
+                "libheif",
+                "libraw",
             ],
         )
 

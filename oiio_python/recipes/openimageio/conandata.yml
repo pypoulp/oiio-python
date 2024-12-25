@@ -1,9 +1,16 @@
 sources:
+  "3.0.1.0":
+      url: "https://github.com/AcademySoftwareFoundation/OpenImageIO/archive/refs/tags/v3.0.1.0.tar.gz"
+      sha256: "7f84c2b9c13be74c4a187fefe3844b391374ba329aa63fbbca21fa232e43c87b"
   "2.5.12.0":
-    url: "https://github.com/AcademySoftwareFoundation/OpenImageIO/archive/refs/tags/v2.5.12.0.tar.gz"
-    sha256: "51ea3c309bad7381fd0d7ef793e93a72d8e0edaeff4ff329f4f21fb5de3d90bd"
+      url: "https://github.com/AcademySoftwareFoundation/OpenImageIO/archive/refs/tags/v2.5.12.0.tar.gz"
+      sha256: "51ea3c309bad7381fd0d7ef793e93a72d8e0edaeff4ff329f4f21fb5de3d90bd"
   
 patches:
+  "3.0.1.0":
+    - patch_file: "patches/3.0.1.0-001-fix-conan-build.patch"
+      patch_description: "Fix build with Conan"
+      patch_type: "conan"
   "2.5.12.0":
     - patch_file: "patches/2.5.12.0-001-cmake-targets.patch"
       patch_description: "Ensure project builds correctly with Conan (don't pick up disabled dependencies from the system, fix different spelling of libraries)"
@@ -11,9 +18,6 @@ patches:
     - patch_file: "patches/2.5.12.0-003-fix-libraw.patch"
       patch_description: "Fix libraw conan name"
       patch_type: "conan"
-    # - patch_file: "patches/2.5.12.0-004-change-output-name.patch"
-    #   patch_description: "Change lib output name to add version number"
-    #   patch_type: "conan"
     - patch_file: "patches/2.5.12.0-005-fix-find-python.patch"
       patch_description: "Fix find python for manylinux builds"
       patch_type: "conan"

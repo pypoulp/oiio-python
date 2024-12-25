@@ -4,22 +4,21 @@ import os
 import sys
 from pathlib import Path
 
-from conan import ConanFile  # type: ignore
-from conan.errors import ConanInvalidConfiguration  # type: ignore
-from conan.tools.apple import is_apple_os  # type: ignore
-from conan.tools.build import check_min_cppstd, default_cppstd  # type: ignore
-from conan.tools.cmake import CMakeDeps  # type: ignore
-from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
-from conan.tools.files import copy  # type: ignore
+from conan import ConanFile
+from conan.errors import ConanInvalidConfiguration
+from conan.tools.apple import is_apple_os
+from conan.tools.build import check_min_cppstd, default_cppstd
+from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
 from conan.tools.files import (
     apply_conandata_patches,
+    copy,
     export_conandata_patches,
     get,
     rm,
     rmdir,
 )
-from conan.tools.microsoft import is_msvc  # type: ignore
-from conan.tools.scm import Version  # type: ignore
+from conan.tools.microsoft import is_msvc
+from conan.tools.scm import Version
 
 
 class OpenColorIOConan(ConanFile):
@@ -30,6 +29,7 @@ class OpenColorIOConan(ConanFile):
     url = "https://github.com/conan-io/conan-center-index"
     topics = ("colors", "visual", "effects", "animation")
     settings = "os", "arch", "compiler", "build_type"
+    package_type = "library"
     options = {
         "shared": [True, False],
         "fPIC": [True, False],
@@ -40,7 +40,7 @@ class OpenColorIOConan(ConanFile):
         "fPIC": True,
         "use_sse": True,
     }
-    tool_requires = "cmake/[>=3.16 <4]"
+    # tool_requires = "cmake/[>=3.16 <4]"
 
     def export_sources(self):
         export_conandata_patches(self)
@@ -72,20 +72,16 @@ class OpenColorIOConan(ConanFile):
 
     def requirements(self):
         self.requires("expat/[>=2.6.2 <3]")
-        self.requires("openexr/3.1.9")
+        self.requires("openexr/3.3.1")
         self.requires("imath/3.1.9")
 
         self.requires("pystring/1.1.4")
         self.requires("yaml-cpp/0.8.0")
-        self.requires("pybind11/2.13.1")
-
-        if Version(self.version) >= "2.3.0":
-            self.requires("minizip-ng/4.0.3")
-        elif Version(self.version) >= "2.2.0":
-            self.requires("minizip-ng/3.0.9")
+        self.requires("pybind11/2.13.6")
+        self.requires("minizip-ng/4.0.3")
 
         # for tools only
-        self.requires("lcms/2.14")
+        self.requires("lcms/2.16")
 
     def validate(self):
         if self.settings.compiler.get_safe("cppstd"):  # pylint: disable=no-member
@@ -134,7 +130,7 @@ class OpenColorIOConan(ConanFile):
         tc.cppstd = default_cppstd(self)
 
         tc.variables["Python_EXECUTABLE"] = Path(sys.executable).as_posix()
-        # tc.variables["pybind11_DIR"] = pybind_dir.as_posix()
+        tc.variables["Python3_EXECUTABLE"] = Path(sys.executable).as_posix()
 
         tc.variables["OCIO_BUILD_PYTHON"] = True
         tc.variables["CMAKE_VERBOSE_MAKEFILE"] = True
@@ -222,6 +218,7 @@ class OpenColorIOConan(ConanFile):
         if self.settings.os != "Windows":  # pylint: disable=no-member
             lib_dir = Path(self.package_folder) / "lib"
             copy(self, "*OpenColorIO*", src=lib_dir, dst=py_lib_folder)
+            copy(self, "*libOpenColorIO*", src=lib_dir, dst=py_lib_folder)
 
         if os.getenv("OIIO_STATIC") != "1":
             tools_dir = py_package_folder / "tools"
@@ -243,12 +240,14 @@ class OpenColorIOConan(ConanFile):
                 copy(self, f"{tool}*", src=bin_dir, dst=tools_dir)
 
         if self.settings.os == "Windows":  # pylint: disable=no-member
-            ocio_sp_folder = Path(self.package_folder) / "lib" / "site-packages"
+            ocio_sp_folder = (
+                Path(self.package_folder) / "lib" / "site-packages" / "PyOpenColorIO"
+            )
             copy(self, "*PyOpenColorIO*", src=ocio_sp_folder, dst=py_package_folder)
         else:
             ocio_lib_folder = Path(self.package_folder) / "lib"
             ocio_py_folder = list(ocio_lib_folder.glob("py*"))[0]
-            ocio_sp_folder = ocio_py_folder / "site-packages"
+            ocio_sp_folder = ocio_py_folder / "site-packages" / "PyOpenColorIO"
             copy(self, "*PyOpenColorIO*", src=ocio_sp_folder, dst=py_package_folder)
 
         license_folder = Path(self.package_folder) / "licenses"

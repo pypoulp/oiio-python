@@ -6,6 +6,10 @@ This project provides (unofficial) multiplatform wheels for [OpenImageIO](https:
 
 Check [types-oiio-python](https://github.com/pypoulp/types-oiio-python) if you want type hints & auto-completion for oiio-python.
 
+[![Build Static Multiplatform Wheels](https://github.com/pypoulp/oiio-python/actions/workflows/build_static_wheels.yml/badge.svg)](https://github.com/pypoulp/oiio-python/actions/workflows/build_static_wheels.yml)
+[![Build Multiplatform Wheels](https://github.com/pypoulp/oiio-python/actions/workflows/build_wheels.yml/badge.svg)](https://github.com/pypoulp/oiio-python/actions/workflows/build_wheels.yml)
+[![Build Linux Wheels](https://github.com/pypoulp/oiio-python/actions/workflows/build_linux_wheels.yml/badge.svg)](https://github.com/pypoulp/oiio-python/actions/workflows/build_linux_wheels.yml)
+
 ---
 
 ## **Features**
@@ -18,6 +22,7 @@ Check [types-oiio-python](https://github.com/pypoulp/types-oiio-python) if you w
 - **📦 Flexible Libraries**: Choose between static and shared libraries to suit your needs.
 
 ---
+
 
 ## **Installation**
 
@@ -36,17 +41,34 @@ This project avoids using the `openimageio` package name because the ASWF may re
 
 ## **What's Included**
 
-This package integrates the following features and dependencies:
+The goal is to enable as many features as possible to make the wheel flexible, while keeping the package size reasonable.
 
-- **[OpenColorIO](https://opencolorio.org/)**: Python bindings included for seamless color management.
+OpenImageIO wheels are built with the following features enabled:
+
+- **[OpenColorIO](https://opencolorio.org/)**: With Python bindings included for seamless color management.
 - **LibRaw**: Adds RAW image support.
-- **Freetype**: Enables text rendering.
+- **OpenEXR**: High dynamic range image support.
+- **Ptex**: Ptex texture mapping support.
+- **OneTBB**: Multithreading support.
+- **FreeType**: Enables text rendering.
 - **TBB**: Multithreading support.
-- **LibWebP**: WebP image support.
-- **LibPNG** and **LibJPEG/OpenJPEG**: For PNG and JPEG support.
-- **Giflib**: GIF support.
-- **HDF5**: High-performance data storage support.
+- **libwebp**: WebP image support.
+- **libpng**: PNG image support.
+- **libjpeg**: Support with libjpeg on musllinux, libjpeg-turbo on other platforms.
+- **giflib**: GIF support.
+- **hdf5**: HDF5 data storage support.
 - **Ptex**: Ptex texture mapping.
+- **libheif**: HEIF/AVIF image support.
+- **libtiff**: TIFF image support.
+- **libjxl**: JPEG XL image support.
+- **libultrahdr**: Adds support for UltraHDR images.
+- **OpenJPEG**: JPEG 2000 support.
+
+*FFmpeg is not included due to potential licensing issues and package size.*
+
+*DICOM support is also not enabled because of large package size.*
+
+*Volumetric format support like **OpenVDB** and **Field3D** are not included for now but could be in the future if requested.*
 
 ---
 
@@ -66,6 +88,30 @@ This project builds two variants of the OpenImageIO Python bindings:
   - **Ideal for avoiding DLL conflicts**, especially when using Python embedded in applications like DCC tools that already use OpenImageIO.
 
 `oiio-python` versions match the original OpenImageIO release version, with an additional build number for the Python bindings. Example oiio-python 2.5.12.0.x is built from OpenImageIO 2.5.12
+
+## License
+
+Code in this repository is licensed under the [Apache 2.0 License](LICENSE) to match the original OpenImageIO license.  
+Third-party libraries are licensed under their respective licenses. Copies of these licenses can be found in the [licenses](licenses) folder.
+
+#### Statically Linked Libraries in Binary Wheels
+
+The binary wheels may include LGPL statically linked libraries, including:
+
+- **[LibRaw](https://github.com/LibRaw/LibRaw)** (LGPL 2.1)
+- **[LibHeif](https://github.com/strukturag/libheif)** (LGPL 3.0)
+
+#### Licensing for Versions Before 3.0.1.0
+
+Before version 3.0.1.0, the distributed wheels are licensed under the [GPL 3.0 License](LICENSE-GPL).
+
+#### Licensing for Versions 3.0.1.0 and Above
+
+For version 3.0.1.0 and above:
+
+- **`oiio-static-python` wheels** are licensed under the [GPL 3.0 License](LICENSE-GPL).
+- **`oiio-python` wheels** are licensed under the [Apache 2.0 License](LICENSE) and include shared libraries for LibRaw and LibHeif.
+
 
 ## **Building the Wheels Yourself**
 
@@ -99,7 +145,7 @@ Although the primary target is automated builds on GitHub Actions, you can also 
     # If you want to build the static variant:
     export OIIO_STATIC=1
     # Set Deployment target according to your macOS version
-    export MACOSX_DEPLOYMENT_TARGET=10.13  # For x86_64 builds
+    export MACOSX_DEPLOYMENT_TARGET=10.15  # For x86_64 builds
     export MACOSX_DEPLOYMENT_TARGET=14.0  # For arm64 builds
     # Set Project root directory to the root of the repository
     export PROJECT_ROOT="/path/to/oiio-python"
@@ -121,7 +167,7 @@ Although the primary target is automated builds on GitHub Actions, you can also 
 
 5. If not building with cibuildwheel, you'll need to manually "repair" the wheel with delocate after build:
 
-6. run provided `macos_fix_shared_libs.py`
+6. run provided `setuputils/macos_fix_shared_libs.py`
 
 7. then use `delocate-wheel` to copy the shared libraries into the wheel:
 
@@ -138,6 +184,8 @@ Although the primary target is automated builds on GitHub Actions, you can also 
 2. Install Docker and build:
 
     ```bash
+    # If building on musl (Alpine) Linux, set the following environment variable:
+    export MUSLLINUX_BUILD=1
     export CIBW_ENVIRONMENT="OIIO_STATIC=1"  # For the static version
     # Optional: Specify target docker image / platform
     export CIBW_BUILD="*manylinux_x86*"
@@ -148,7 +196,7 @@ Although the primary target is automated builds on GitHub Actions, you can also 
 3. To build for the current Python version and distribution:
 
     - Ensure Perl is installed (required for dependencies).
-    - Use `linux_before_all.sh` if needed.
+    - Use `setuputils/linux_before_all.sh` if needed.
 
 
         ```bash
