@@ -22,10 +22,7 @@ class BinaryDistribution(Distribution):
 if __name__ == "__main__":
 
     license_files_paths = list((here / "licenses").glob("*"))
-    license_files = [
-        license_file_path.relative_to(here).as_posix()
-        for license_file_path in license_files_paths
-    ]
+    license_files = [license_file_path.relative_to(here).as_posix() for license_file_path in license_files_paths]
 
     print("including license files:")
     for license_file in license_files:
@@ -36,7 +33,7 @@ if __name__ == "__main__":
 
     print("=" * 80)
     if static_build:
-        license_files.append("LICENSE-LGPL")
+        license_files.append("LICENSE-GPL")
         print("Building static libraries.")
     else:
         license_files.append("LICENSE")
@@ -115,7 +112,7 @@ if __name__ == "__main__":
         scripts = {}
         include_data = False
         zip_safe = True
-        license_files += ["LICENSE-LGPL", "LICENSE"]
+        license_files += ["LICENSE-GPL", "LICENSE"]
 
     package_name = "oiio-static-python" if static_build else "oiio-python"
 
@@ -152,8 +149,8 @@ if __name__ == "__main__":
             "Programming Language :: Python :: 3.13",
             "Programming Language :: C++",
             "Programming Language :: Python :: Implementation :: CPython",
-            "License :: OSI Approved :: MIT License",
-            "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+            "License :: OSI Approved :: Apache Software License 2.0 (ASL 2.0)",
+            "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         ],
         python_requires=">=3.8,<3.14",
         install_requires=[

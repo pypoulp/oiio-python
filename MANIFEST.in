@@ -4,7 +4,7 @@ recursive-include setuputils *.py
 
 # Add a license file explicitly
 include LICENSE
-include LICENSE-LGPL
+include LICENSE-GPL
 recursive-include licenses *
 
 

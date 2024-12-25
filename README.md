@@ -81,13 +81,13 @@ The binary wheels may include statically linked libraries:
 
 #### Licensing for Versions Before 3.0.1.0
 
-Before version 3.0.1.0, the distributed wheels are licensed under the [LGPL 3.0 License](LICENSE-LGPL).
+Before version 3.0.1.0, the distributed wheels are licensed under the [GPL 3.0 License](LICENSE-GPL).
 
 #### Licensing for Versions 3.0.1.0 and Above
 
 For version 3.0.1.0 and above:
 
-- **`oiio-static-python` wheels** are licensed under the [LGPL 3.0 License](LICENSE-LGPL).
+- **`oiio-static-python` wheels** are licensed under the [GPL 3.0 License](LICENSE-GPL).
 - **`oiio-python` wheels** are licensed under the [Apache 2.0 License](LICENSE) and include shared libraries for LibRaw and LibHeif.
 
 
