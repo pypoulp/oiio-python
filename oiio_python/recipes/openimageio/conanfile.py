@@ -43,9 +43,9 @@ class OpenImageIOConan(ConanFile):
         "with_tools": [True, False],
     }
     default_options = {
-        "shared": os.getenv("OIIO_STATIC") != "1",
+        "shared": True,
         "fPIC": True,
-        "with_tools": os.getenv("OIIO_STATIC") != "1",
+        "with_tools": True,
     }
 
     def export_sources(self):
@@ -60,8 +60,15 @@ class OpenImageIOConan(ConanFile):
             self.options["freetype"].with_png = False
             self.options["freetype"].with_brotli = False
 
-        if os.getenv("OIIO_STATIC") != "1":
+        if os.getenv("OIIO_STATIC") == "1":
+            self.options.shared = False
             self.options.with_tools = False
+            self.options["libraw"].shared = False
+            self.options["libheif"].shared = False
+
+        else:
+            self.options.shared = True
+            self.options.with_tools = True
             self.options["libraw"].shared = True
             self.options["libheif"].shared = True
 
@@ -121,9 +128,7 @@ class OpenImageIOConan(ConanFile):
         if self.settings.compiler.cppstd:  # pylint: disable=no-member
             check_min_cppstd(self, 17)
         if is_msvc(self) and is_msvc_static_runtime(self) and self.options.shared:
-            raise ConanInvalidConfiguration(
-                "Building shared library with static runtime is not supported!"
-            )
+            raise ConanInvalidConfiguration("Building shared library with static runtime is not supported!")
 
     def layout(self):
         cmake_layout(self, src_folder="src")
@@ -156,9 +161,7 @@ class OpenImageIOConan(ConanFile):
         # Conan is normally not used for testing, so fixing this option to not build the tests
         tc.variables["BUILD_TESTING"] = False
         tc.variables["USE_JPEGTURBO"] = not self.dont_use_jpeg_turbo
-        tc.variables["USE_JPEG"] = (
-            True  # Needed for jpeg.imageio plugin, libjpeg/libjpeg-turbo selection still works
-        )
+        tc.variables["USE_JPEG"] = True  # Needed for jpeg.imageio plugin, libjpeg/libjpeg-turbo selection still works
         tc.variables["USE_HDF5"] = True
         tc.variables["USE_OPENCOLORIO"] = True
         tc.variables["USE_OPENCV"] = False
