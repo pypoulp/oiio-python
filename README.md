@@ -1,4 +1,7 @@
 # **oiio-python**
+[![Build Static Multiplatform Wheels](https://github.com/pypoulp/oiio-python/actions/workflows/build_static_wheels.yml/badge.svg)](https://github.com/pypoulp/oiio-python/actions/workflows/build_static_wheels.yml)
+[![Build Multiplatform Wheels](https://github.com/pypoulp/oiio-python/actions/workflows/build_wheels.yml/badge.svg)](https://github.com/pypoulp/oiio-python/actions/workflows/build_wheels.yml)
+[![Build Linux Wheels](https://github.com/pypoulp/oiio-python/actions/workflows/build_linux_wheels.yml/badge.svg)](https://github.com/pypoulp/oiio-python/actions/workflows/build_linux_wheels.yml)
 
 **🐍 OpenImageIO on wheels!**
 
@@ -18,6 +21,7 @@ Check [types-oiio-python](https://github.com/pypoulp/types-oiio-python) if you w
 - **📦 Flexible Libraries**: Choose between static and shared libraries to suit your needs.
 
 ---
+
 
 ## **Installation**
 
