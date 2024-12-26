@@ -133,6 +133,8 @@ def main():
 
     if args.static:
         os.environ["OIIO_STATIC"] = "1"
+    else:
+        os.environ["OIIO_STATIC"] = "0"
 
     if args.release:
         confirm = (
