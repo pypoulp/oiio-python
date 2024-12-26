@@ -54,7 +54,7 @@ OpenImageIO wheels are built with the following features enabled:
 - **TBB**: Multithreading support.
 - **libwebp**: WebP image support.
 - **libpng**: PNG image support.
-- **libjpeg**: Support with libjpeg on musllinux, libjpeg-turbo on other platforms.
+- **libjpeg**: Support with libjpeg on musllinux, and manylinux static builds, libjpeg-turbo on other platforms.
 - **giflib**: GIF support.
 - **hdf5**: HDF5 data storage support.
 - **Ptex**: Ptex texture mapping.
