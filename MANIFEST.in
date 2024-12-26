@@ -1,6 +1,7 @@
 # Include specific file types from all subdirectories of 'oiio_python'
 recursive-include oiio_python *.py *.txt *.cpp *.yml *.patch *.md
 recursive-include setuputils *.py
+include test.py
 
 # Add a license file explicitly
 include LICENSE
