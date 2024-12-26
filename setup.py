@@ -149,7 +149,7 @@ if __name__ == "__main__":
             "Programming Language :: Python :: 3.13",
             "Programming Language :: C++",
             "Programming Language :: Python :: Implementation :: CPython",
-            "License :: OSI Approved :: Apache Software License 2.0 (ASL 2.0)",
+            "License :: OSI Approved :: Apache Software License",
             "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         ],
         python_requires=">=3.8,<3.14",
