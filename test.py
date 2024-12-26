@@ -39,11 +39,6 @@ def main():
     colorSpaceNames = [cs.getName() for cs in config.getColorSpaces()]
     print("Color Spaces: ", colorSpaceNames)
 
-    img_a = np.random.rand(100, 100).astype(np.float32)
-
-    buf = oiio.ImageBuf(img_a)
-    buf.write("test.exr")
-
     # Print version
     print("OpenImageIO Version: ", oiio.__version__)
     print("OpenColorIO Version: ", ocio.__version__)
