@@ -1,7 +1,6 @@
 import os
 import subprocess
 
-import numpy as np
 import OpenImageIO as oiio
 import PyOpenColorIO as ocio
 
