@@ -31,7 +31,7 @@ def test_tools():
 
 def main():
     # Test tools
-    if os.getenv("OIIO_STATIC") == "1":
+    if os.getenv("OIIO_STATIC") != "1":
         test_tools()
 
     config = ocio.GetCurrentConfig()
