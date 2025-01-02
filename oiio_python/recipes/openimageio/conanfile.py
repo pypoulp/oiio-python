@@ -269,10 +269,10 @@ class OpenImageIOConan(ConanFile):
             if "onetbb" in str(dep):
                 if self.settings.os == "Windows":
                     tbb_bin_folder = Path(dep.package_folder) / "bin"
-                    copy(self, "tbb12*", src=tbb_bin_folder, dst=py_lib_folder)
+                    copy(self, "*tbb*", src=tbb_bin_folder, dst=py_lib_folder)
                 else:
                     tbb_lib_folder = Path(dep.package_folder) / "lib"
-                    copy(self, "*libtbb.*", src=tbb_lib_folder, dst=py_lib_folder)
+                    copy(self, "*libtbb*", src=tbb_lib_folder, dst=py_lib_folder)
 
             if os.getenv("OIIO_STATIC") != "1":
                 if "raw" in str(dep):
