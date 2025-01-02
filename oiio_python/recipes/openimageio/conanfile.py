@@ -334,9 +334,11 @@ class OpenImageIOConan(ConanFile):
             "openexr::openexr",
             "pybind11::pybind11",
             "libjxl::libjxl",
-            "onetbb::onetbb",
             "libuhdr::libuhdr",
         ]
+
+        if os.getenv("MUSLLINUX_BUILD") != "1":
+            self.cpp_info.requires.append("onetbb::onetbb")
 
         if self.dont_use_jpeg_turbo:
             self.cpp_info.requires.append("libjpeg::libjpeg")
