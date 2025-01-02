@@ -317,7 +317,8 @@ class OpenImageIOConan(ConanFile):
         open_image_io_util.libs = ["OpenImageIO_Util"]
         if self.settings.os in ["Linux", "FreeBSD"]:
             open_image_io_util.system_libs.extend(["dl", "m", "pthread"])
-            open_image_io_util.requires.append("onetbb::onetbb")
+            if os.getenv("MUSLLINUX_BUILD") != "1":
+                open_image_io_util.requires.append("onetbb::onetbb")
 
         # OpenImageIO::OpenImageIO
         open_image_io = self._add_component("OpenImageIO")
