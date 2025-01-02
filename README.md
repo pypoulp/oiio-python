@@ -51,13 +51,12 @@ OpenImageIO wheels are built with the following features enabled:
 - **Ptex**: Ptex texture mapping support.
 - **OneTBB**: Multithreading support.
 - **FreeType**: Enables text rendering.
-- **TBB**: Multithreading support.
+- **TBB**: Multithreading support. Disabled in musllinux builds.
 - **libwebp**: WebP image support.
 - **libpng**: PNG image support.
 - **libjpeg**: Support with libjpeg on musllinux, and manylinux static builds, libjpeg-turbo on other platforms.
 - **giflib**: GIF support.
 - **hdf5**: HDF5 data storage support.
-- **Ptex**: Ptex texture mapping.
 - **libheif**: HEIF/AVIF image support.
 - **libtiff**: TIFF image support.
 - **libjxl**: JPEG XL image support.
@@ -68,7 +67,7 @@ OpenImageIO wheels are built with the following features enabled:
 
 *DICOM support is also not enabled because of large package size.*
 
-*Volumetric format support like **OpenVDB** and **Field3D** are not included for now but could be in the future if requested.*
+*Volumetric format support like **OpenVDB** are not included for now but could be in the future if requested.*
 
 ---
 
@@ -116,6 +115,8 @@ For version 3.0.1.0 and above:
 ## **Building the Wheels Yourself**
 
 Although the primary target is automated builds on GitHub Actions, you can also build the wheels locally.
+
+**Note:** Build system will use your `default` Conan profile to create a new `default_oiio_build` profile, make sure it's configured correctly.
 
 ### **Windows**
 
@@ -215,7 +216,7 @@ Although the primary target is automated builds on GitHub Actions, you can also 
 
 ### **Notes**
 
- - A Github Action exists to build on Linux aarch64 using QEMU emulation, but it's way too slow and reach timeout. Current aarch64 wheels are built locally on a Raspberry Pi 5, only for manyLinux.
+ - A Github Action exists to build on Linux aarch64 using QEMU emulation, but it's way too slow and reaches timeout. Current aarch64 wheels are built locally on a Raspberry Pi 5, only for manyLinux.
 
  - I'm not an expert in Conan, CMake, or Cibuildwheel. Feedback and suggestions for improvement are highly appreciated.
 
