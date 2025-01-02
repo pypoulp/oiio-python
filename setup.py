@@ -22,7 +22,10 @@ class BinaryDistribution(Distribution):
 if __name__ == "__main__":
 
     license_files_paths = list((here / "licenses").glob("*"))
-    license_files = [license_file_path.relative_to(here).as_posix() for license_file_path in license_files_paths]
+    license_files = [
+        license_file_path.relative_to(here).as_posix()
+        for license_file_path in license_files_paths
+    ]
 
     print("including license files:")
     for license_file in license_files:
@@ -154,7 +157,7 @@ if __name__ == "__main__":
         ],
         python_requires=">=3.8,<3.14",
         install_requires=[
-            "numpy>=1.21.2,<2.0.0",
+            "numpy>=1.21.2,<2.3.0",
         ],
         extras_require={
             "dev": [
