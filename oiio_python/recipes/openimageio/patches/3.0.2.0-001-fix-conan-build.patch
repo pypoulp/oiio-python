@@ -83,7 +83,7 @@
  # Intel TBB
  set (TBB_USE_DEBUG_BUILD OFF)
 -checked_find_package (TBB 2017
-+checked_find_package (TBB REQUIRED
++checked_find_package (TBB
                        SETVARIABLES OIIO_TBB
                        PREFER_CONFIG)
  
