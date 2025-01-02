@@ -110,7 +110,8 @@ class OpenImageIOConan(ConanFile):
         self.requires("hdf5/1.14.3")
         self.requires("opencolorio/2.4.0")
         # self.requires("opencv/4.8.1")
-        self.requires("onetbb/2021.10.0")
+        if os.getenv("MUSLLINUX_BUILD") != "1":
+            self.requires("onetbb/2021.10.0")
         # self.requires("dcmtk/3.6.7")
         # self.requires("ffmpeg/6.1")
         # TODO: Field3D dependency
@@ -169,7 +170,10 @@ class OpenImageIOConan(ConanFile):
         tc.variables["USE_HDF5"] = True
         tc.variables["USE_OPENCOLORIO"] = True
         tc.variables["USE_OPENCV"] = False
-        tc.variables["USE_TBB"] = False
+        if os.getenv("MUSLLINUX_BUILD") == "1":
+            tc.variables["USE_TBB"] = False
+        else:
+            tc.variables["USE_TBB"] = True
         tc.variables["USE_DCMTK"] = False
         tc.variables["USE_FFMPEG"] = False
         tc.variables["USE_FIELD3D"] = False
