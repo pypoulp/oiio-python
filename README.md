@@ -4,6 +4,8 @@
 
 This project provides (unofficial) multiplatform wheels for [OpenImageIO](https://github.com/AcademySoftwareFoundation/OpenImageIO) Python bindings, simplifying installation and integration into Python projects.
 
+[![PyPI Downloads](https://static.pepy.tech/badge/oiio-python/month)](https://pepy.tech/projects/oiio-python)
+
 Check [types-oiio-python](https://github.com/pypoulp/types-oiio-python) if you want type hints & auto-completion for oiio-python.
 
 [![Build Static Multiplatform Wheels](https://github.com/pypoulp/oiio-python/actions/workflows/build_static_wheels.yml/badge.svg)](https://github.com/pypoulp/oiio-python/actions/workflows/build_static_wheels.yml)
