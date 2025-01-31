@@ -13,7 +13,6 @@ from conan.tools.files import (
     copy,
     export_conandata_patches,
     get,
-    replace_in_file,
     rm,
     rmdir,
 )
@@ -322,6 +321,8 @@ class OpenImageIOConan(ConanFile):
             open_image_io_util.system_libs.extend(["dl", "m", "pthread"])
             if os.getenv("MUSLLINUX_BUILD") != "1":
                 open_image_io_util.requires.append("onetbb::onetbb")
+        else:
+            open_image_io_util.requires.append("onetbb::onetbb")
 
         # OpenImageIO::OpenImageIO
         open_image_io = self._add_component("OpenImageIO")
