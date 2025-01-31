@@ -317,6 +317,7 @@ class OpenImageIOConan(ConanFile):
         # OpenImageIO::OpenImageIO_Util
         open_image_io_util = self._add_component("OpenImageIO_Util")
         open_image_io_util.libs = ["OpenImageIO_Util"]
+        # Exclude TBB in musllinux
         if self.settings.os in ["Linux", "FreeBSD"]:
             open_image_io_util.system_libs.extend(["dl", "m", "pthread"])
             if os.getenv("MUSLLINUX_BUILD") != "1":
