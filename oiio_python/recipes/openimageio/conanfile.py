@@ -278,7 +278,7 @@ class OpenImageIOConan(ConanFile):
                     copy(self, "*tbb*", src=tbb_bin_folder, dst=py_lib_folder)
                 else:
                     tbb_lib_folder = Path(dep.package_folder) / "lib"
-                    copy(self, "*libtbb*", src=tbb_lib_folder, dst=py_lib_folder)
+                    copy(self, "*tbb*", src=tbb_lib_folder, dst=py_lib_folder)
 
             if os.getenv("OIIO_STATIC") != "1":
                 if "raw" in str(dep):
@@ -344,12 +344,13 @@ class OpenImageIOConan(ConanFile):
         ]
 
         if os.getenv("MUSLLINUX_BUILD") != "1":
-            self.cpp_info.requires.append("onetbb::onetbb")
+            self.open_image_io.requires.append("onetbb::onetbb")
 
         if self.dont_use_jpeg_turbo:
-            self.cpp_info.requires.append("libjpeg::libjpeg")
+            self.open_image_io.requires.append("libjpeg::libjpeg")
         else:
-            self.cpp_info.requires.append("libjpeg-turbo::libjpeg-turbo")
+            self.open_image_io.requires.append("libjpeg-turbo::libjpeg-turbo")
+
         open_image_io.requires.append("libpng::libpng")
         open_image_io.requires.append("freetype::freetype")
         open_image_io.requires.append("hdf5::hdf5")
