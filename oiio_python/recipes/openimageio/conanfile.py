@@ -72,6 +72,9 @@ class OpenImageIOConan(ConanFile):
             self.options["libraw"].shared = True
             self.options["libheif"].shared = True
 
+        # TBB always shared
+        self.options["onetbb"].shared = True
+
     def configure(self):
         if self.options.shared:
             self.options.rm_safe("fPIC")
