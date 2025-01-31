@@ -50,7 +50,7 @@ if __name__ == "__main__":
         # Build OpenColorIO and OpenImageIO
         build_packages(static_build)
         # Fix shared libraries on macos
-        if not static_build and platform.system() == "Darwin":
+        if platform.system() == "Darwin":
             relink_and_delocate()
         # Include tools if using shared libraries version
         if static_build:

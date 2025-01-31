@@ -41,6 +41,8 @@ pip install oiio-static-python
 
 This project avoids using the `openimageio` package name because the ASWF may release official wheels in the future.
 
+You do NOT need to have OpenImageIO installed on your system. `oiio-python` ship with all necessary shared library.
+
 ## **What's Included**
 
 The goal is to enable as many features as possible to make the wheel flexible, while keeping the package size reasonable.
