@@ -344,12 +344,12 @@ class OpenImageIOConan(ConanFile):
         ]
 
         if os.getenv("MUSLLINUX_BUILD") != "1":
-            self.open_image_io.requires.append("onetbb::onetbb")
+            open_image_io.requires.append("onetbb::onetbb")
 
         if self.dont_use_jpeg_turbo:
-            self.open_image_io.requires.append("libjpeg::libjpeg")
+            open_image_io.requires.append("libjpeg::libjpeg")
         else:
-            self.open_image_io.requires.append("libjpeg-turbo::libjpeg-turbo")
+            open_image_io.requires.append("libjpeg-turbo::libjpeg-turbo")
 
         open_image_io.requires.append("libpng::libpng")
         open_image_io.requires.append("freetype::freetype")
