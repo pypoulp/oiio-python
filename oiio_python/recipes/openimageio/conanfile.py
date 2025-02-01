@@ -272,7 +272,7 @@ class OpenImageIOConan(ConanFile):
 
         # Copy TBB binaries
         for dep in self.dependencies.values():
-            if "onetbb" in str(dep):
+            if "tbb" in str(dep):
                 if self.settings.os == "Windows":
                     tbb_bin_folder = Path(dep.package_folder) / "bin"
                     copy(self, "*tbb*", src=tbb_bin_folder, dst=py_lib_folder)

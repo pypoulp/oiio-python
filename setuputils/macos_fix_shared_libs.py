@@ -9,6 +9,7 @@ and need precise control over their paths and dependencies.
 """
 
 import subprocess
+import os
 from pathlib import Path
 
 project = Path(__file__).parent.parent.resolve()
@@ -120,40 +121,74 @@ def relink_and_delocate():
         oiio_so = next((base_path / "OpenImageIO").glob("*.so"))
         ocio_so = next((base_path / "PyOpenColorIO").glob("*.so"))
 
-        lib_oiio = max(
-            (f for f in libs_dir.glob("libOpenImageIO.*.dylib") if not f.is_symlink()),
-            key=lambda f: f.stat().st_size,
-        )
-        lib_ocio = max(
-            (f for f in libs_dir.glob("libOpenColorIO.*.dylib") if not f.is_symlink()),
-            key=lambda f: f.stat().st_size,
-        )
-        lib_tbb = libs_dir / "libtbb.12.10.dylib"
+        if os.getenv("OIIO_STATIC") != "1":
+            lib_oiio = max(
+                (
+                    f
+                    for f in libs_dir.glob("libOpenImageIO.*.dylib")
+                    if not f.is_symlink()
+                ),
+                key=lambda f: f.stat().st_size,
+            )
+            lib_ocio = max(
+                (
+                    f
+                    for f in libs_dir.glob("libOpenColorIO.*.dylib")
+                    if not f.is_symlink()
+                ),
+                key=lambda f: f.stat().st_size,
+            )
+            lib_tbb = libs_dir / "libtbb.12.10.dylib"
 
-        # Check required files exist
-        required_files = [oiio_so, ocio_so, lib_oiio, lib_ocio, lib_tbb]
-        for path in required_files:
-            if not path.is_file():
-                raise FileNotFoundError(f"Required file '{path}' does not exist.")
+            # Check required files exist
+            required_files = [oiio_so, ocio_so, lib_oiio, lib_ocio, lib_tbb]
+            for path in required_files:
+                if not path.is_file():
+                    raise FileNotFoundError(f"Required file '{path}' does not exist.")
 
-        # Update RPATH references
-        update_rpath_references(
-            libs_dir,
-            [
-                "libtbb",
-                "libtbbmalloc",
-                "libtbbmalloc_proxy",
-                "libOpenImageIO",
-                "libOpenColorIO",
-                "libOpenImageIO_Util",
-                "libheif",
-                "libraw",
-            ],
-        )
+            # Update RPATH references for all the dylibs.
+            update_rpath_references(
+                libs_dir,
+                [
+                    "libtbb",
+                    "libtbbmalloc",
+                    "libtbbmalloc_proxy",
+                    "libOpenImageIO",
+                    "libOpenColorIO",
+                    "libOpenImageIO_Util",
+                    "libheif",
+                    "libraw",
+                ],
+            )
 
-        # Ensure LC_RPATH for all binaries
-        ensure_rpaths([oiio_so, ocio_so, lib_oiio, lib_ocio, lib_tbb], "@loader_path")
-        ensure_rpaths([oiio_so, ocio_so], "@loader_path/../../.dylibs")
+            # Ensure LC_RPATH for all binaries
+            ensure_rpaths(
+                [oiio_so, ocio_so, lib_oiio, lib_ocio, lib_tbb], "@loader_path"
+            )
+            ensure_rpaths([oiio_so, ocio_so], "@loader_path/../../.dylibs")
+
+        else:
+            # Static build: only TBB is required to be relocated.
+            lib_tbb = libs_dir / "libtbb.12.10.dylib"
+
+            # Check required files exist
+            required_files = [lib_tbb]
+            for path in required_files:
+                if not path.is_file():
+                    raise FileNotFoundError(f"Required file '{path}' does not exist.")
+
+            # Update RPATH references for TBB dylibs.
+            update_rpath_references(
+                libs_dir,
+                [
+                    "libtbb",
+                    "libtbbmalloc",
+                    "libtbbmalloc_proxy",
+                ],
+            )
+
+            # Ensure LC_RPATH for all binaries
+            ensure_rpaths([oiio_so, ocio_so, lib_tbb], "@loader_path")
 
         print("Relinking and RPATH configuration completed successfully.")
 
