@@ -220,10 +220,4 @@ Although the primary target is automated builds on GitHub Actions, you can also 
 
 ### **Notes**
 
- - A Github Action exists to build on Linux aarch64 using QEMU emulation, but it's way too slow and reaches timeout. Current aarch64 wheels are built locally on a Raspberry Pi 5, only for manyLinux.
-
  - I'm not an expert in Conan, CMake, or Cibuildwheel. Feedback and suggestions for improvement are highly appreciated.
-
- - Optimizing the build process to avoid rebuilding LibOpenImageIO for each Python version is a potential area for improvement.
-
- - Although Conan may not be ideal for building wheels, it's currently used here due to the complexity of dependencies and the need to build from scratch for manyLinux/musllinux compatibility.
