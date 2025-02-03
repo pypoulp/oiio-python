@@ -71,9 +71,6 @@ class OpenImageIOConan(ConanFile):
             self.options["libraw"].shared = True
             self.options["libheif"].shared = True
 
-        # TBB always shared
-        self.options["onetbb"].shared = True
-
     def configure(self):
         if self.options.shared:
             self.options.rm_safe("fPIC")
@@ -85,6 +82,18 @@ class OpenImageIOConan(ConanFile):
         elif os.getenv("OIIO_STATIC") == "1" and self.settings.os in [
             "Linux",
             "FreeBSD",
+        ]:
+            return True
+        return False
+
+    @property
+    def dont_use_tbb(self):
+        if os.getenv("MUSLLINUX_BUILD") == "1":
+            return True
+        # Disable TBB on macos static build for now
+        elif os.getenv("OIIO_STATIC") == "1" and self.settings.os not in [
+            "Linux",
+            "Windows",
         ]:
             return True
         return False
@@ -112,7 +121,7 @@ class OpenImageIOConan(ConanFile):
         self.requires("hdf5/1.14.3")
         self.requires("opencolorio/2.4.0")
         # self.requires("opencv/4.8.1")
-        if os.getenv("MUSLLINUX_BUILD") != "1":
+        if not self.dont_use_tbb:
             self.requires("onetbb/2021.10.0")
         # self.requires("dcmtk/3.6.7")
         # self.requires("ffmpeg/6.1")
@@ -172,7 +181,7 @@ class OpenImageIOConan(ConanFile):
         tc.variables["USE_HDF5"] = True
         tc.variables["USE_OPENCOLORIO"] = True
         tc.variables["USE_OPENCV"] = False
-        if os.getenv("MUSLLINUX_BUILD") == "1":
+        if self.dont_use_tbb:
             tc.variables["USE_TBB"] = False
         else:
             tc.variables["USE_TBB"] = True
@@ -320,9 +329,8 @@ class OpenImageIOConan(ConanFile):
         # Exclude TBB in musllinux
         if self.settings.os in ["Linux", "FreeBSD"]:
             open_image_io_util.system_libs.extend(["dl", "m", "pthread"])
-            if os.getenv("MUSLLINUX_BUILD") != "1":
-                open_image_io_util.requires.append("onetbb::onetbb")
-        else:
+
+        if not self.dont_use_tbb:
             open_image_io_util.requires.append("onetbb::onetbb")
 
         # OpenImageIO::OpenImageIO
@@ -343,7 +351,7 @@ class OpenImageIOConan(ConanFile):
             "libuhdr::libuhdr",
         ]
 
-        if os.getenv("MUSLLINUX_BUILD") != "1":
+        if not self.dont_use_tbb:
             open_image_io.requires.append("onetbb::onetbb")
 
         if self.dont_use_jpeg_turbo:

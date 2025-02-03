@@ -4,50 +4,28 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_static_wheels:
-    name: Build static Linux aarch64 wheels
-    runs-on: ubuntu-latest
+  build_wheels:
+    name: Build ${{ matrix.linking }} wheels on ${{ matrix.distrib }}
+    runs-on: ubuntu-24.04-arm
+    strategy:
+      matrix:
+        distrib: [manylinux, musllinux]
+        linking: [dynamic, static]
+
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: aarch64
-
-      - name: Build static wheels
+      - name: Build wheels
         uses: pypa/cibuildwheel@v2.22.0
         env:
-          CIBW_ARCHS_LINUX: aarch64
-          OIIO_STATIC: 1
-          CIBW_ENVIRONMENT: OIIO_STATIC=1
+          CIBW_ENVIRONMENT_PASS_LINUX: OIIO_STATIC CIBUILDWHEEL MUSLLINUX_BUILD
+          MUSLLINUX_BUILD: ${{ matrix.distrib == 'musllinux' && '1' || '0' }}
+          OIIO_STATIC: ${{ matrix.linking == 'static' && '1' || '0' }}
+          CIBW_BUILD: ${{ matrix.distrib == 'manylinux' && '*manylinux_x86*' || '*musllinux_x86*' }}
+
         with:
           output-dir: wheelhouse
 
       - uses: actions/upload-artifact@v4
         with:
-          name: cibw-static-wheels-linux-aarch64
-          path: ./wheelhouse/*.whl
-  
-  build_shared_wheels:
-    name: Build shared Linux aarch64 wheels
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: aarch64
-
-      - name: Build shared wheels
-        uses: pypa/cibuildwheel@v2.22.0
-        env:
-          CIBW_ARCHS_LINUX: aarch64
-        with:
-          output-dir: wheelhouse
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: cibw-shared-wheels-linux-aarch64
+          name:  cibw-aarch64-${{ matrix.linking }}-wheels-${{ matrix.distrib }}-${{ strategy.job-index }}
           path: ./wheelhouse/*.whl
