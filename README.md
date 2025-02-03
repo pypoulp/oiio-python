@@ -12,6 +12,7 @@ Check [types-oiio-python](https://github.com/pypoulp/types-oiio-python) if you w
 [![Build Multiplatform Wheels](https://github.com/pypoulp/oiio-python/actions/workflows/build_wheels.yml/badge.svg)](https://github.com/pypoulp/oiio-python/actions/workflows/build_wheels.yml)
 [![Build Linux Wheels](https://github.com/pypoulp/oiio-python/actions/workflows/build_linux_wheels.yml/badge.svg)](https://github.com/pypoulp/oiio-python/actions/workflows/build_linux_wheels.yml)
 
+
 ---
 
 ## **Features**
@@ -55,7 +56,7 @@ OpenImageIO wheels are built with the following features enabled:
 - **Ptex**: Ptex texture mapping support.
 - **OneTBB**: Multithreading support.
 - **FreeType**: Enables text rendering.
-- **TBB**: Multithreading support. Disabled in musllinux builds.
+- **TBB**: Multithreading support with Intel TBB. Disabled in musllinux/static MacOS builds.
 - **libwebp**: WebP image support.
 - **libpng**: PNG image support.
 - **libjpeg**: Support with libjpeg on musllinux, and manylinux static builds, libjpeg-turbo on other platforms.
