@@ -67,29 +67,33 @@ def conan_profile_ensure(cpp_std: str = "14") -> None:
 
 def build_cleanup(recipe_dir: Path) -> None:
     """Clean build artifacts from a Conan recipe directory."""
-    build_dir = recipe_dir / "build"
-    if build_dir.exists():
-        shutil.rmtree(build_dir)
 
-    src_dir = recipe_dir / "src"
-    if src_dir.exists():
-        shutil.rmtree(src_dir)
+    try:
+        build_dir = recipe_dir / "build"
+        if build_dir.exists():
+            shutil.rmtree(build_dir)
 
-    cmake_presets = recipe_dir / "CMakeUserPresets.json"
+        src_dir = recipe_dir / "src"
+        if src_dir.exists():
+            shutil.rmtree(src_dir)
 
-    if cmake_presets.exists():
-        cmake_presets.unlink()
+        cmake_presets = recipe_dir / "CMakeUserPresets.json"
 
-    test_package_dir = recipe_dir / "test_package"
-    if test_package_dir.exists():
-        test_build = test_package_dir / "build"
+        if cmake_presets.exists():
+            cmake_presets.unlink()
 
-        if test_build.exists():
-            shutil.rmtree(test_build)
+        test_package_dir = recipe_dir / "test_package"
+        if test_package_dir.exists():
+            test_build = test_package_dir / "build"
 
-        test_cmake_presets = test_package_dir / "CMakeUserPresets.json"
-        if test_cmake_presets.exists():
-            test_cmake_presets.unlink()
+            if test_build.exists():
+                shutil.rmtree(test_build)
+
+            test_cmake_presets = test_package_dir / "CMakeUserPresets.json"
+            if test_cmake_presets.exists():
+                test_cmake_presets.unlink()
+    except PermissionError as e:
+        print(f"Cant cleaning build artifacts: {e}")
 
 
 def conan_install_package(
