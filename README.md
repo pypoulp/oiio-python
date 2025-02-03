@@ -13,6 +13,8 @@ Check [types-oiio-python](https://github.com/pypoulp/types-oiio-python) if you w
 [![Build Linux Wheels](https://github.com/pypoulp/oiio-python/actions/workflows/build_linux_wheels.yml/badge.svg)](https://github.com/pypoulp/oiio-python/actions/workflows/build_linux_wheels.yml)
 
 
+**Note:** Official wheels are now available 🎉 ! I'll continue to maintain these builds aside cos they still provide some extra stuff, like integrated PyOpenColorIO, and more enabled features.
+
 ---
 
 ## **Features**
