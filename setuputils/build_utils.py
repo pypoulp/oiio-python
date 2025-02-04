@@ -94,6 +94,7 @@ def build_cleanup(recipe_dir: Path) -> None:
                 test_cmake_presets = test_package_dir / "CMakeUserPresets.json"
                 if test_cmake_presets.exists():
                     test_cmake_presets.unlink()
+            break
         except PermissionError:
             time.sleep(1)
             retry += 1
