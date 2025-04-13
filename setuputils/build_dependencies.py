@@ -45,6 +45,13 @@ def build_dependencies() -> None:
     conan_install_package(libuhdr_dep_dir, libuhdr_version, profile=profile_name)
     build_cleanup(libuhdr_dep_dir)
 
+    # bzip2 on linux
+    if platform.system() == "Linux":
+        bzip2_dep_dir = project / "oiio_python" / "recipes" / "dependencies" / "bzip2"
+        bzip2_version = "1.0.8"
+        conan_install_package(bzip2_dep_dir, bzip2_version, profile=profile_name)
+        build_cleanup(bzip2_dep_dir)
+
 
 def _main() -> None:
     python_exe = sys.executable

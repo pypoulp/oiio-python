@@ -39,7 +39,7 @@ jobs:
         run: echo "CIBW_PLATFORM=windows" >> $GITHUB_ENV
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.22.0
+        uses: pypa/cibuildwheel@v2.23.2
         env:
           MACOSX_DEPLOYMENT_TARGET: ${{ env.MACOSX_DEPLOYMENT_TARGET }}
           CIBW_PLATFORM: ${{ env.CIBW_PLATFORM }}

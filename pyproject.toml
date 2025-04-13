@@ -15,6 +15,7 @@ skip = [
   "pp*", # Disable building PyPy wheels on all platforms
   "*-win32", # Skip 32-bit builds
   "*-manylinux_i686", # Skip 32-bit builds
+  "cp313-win_amd64", # FindPython issue on cibuildwheels on 3.13 Windows
 ]
 test-command = "python {project}/test.py"
 

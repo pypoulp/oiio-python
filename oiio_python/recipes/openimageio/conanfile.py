@@ -47,6 +47,8 @@ class OpenImageIOConan(ConanFile):
         "with_tools": True,
     }
 
+    tool_requires = "cmake/[>=3.29 <4]"
+
     def export_sources(self):
         export_conandata_patches(self)
 
@@ -157,7 +159,10 @@ class OpenImageIOConan(ConanFile):
         # if self.settings.os == "Linux":
         #     tc.variables["DCOMPILER_SUPPORTS_ATOMIC_WITHOUT_LIBATOMIC_EXITCODE"] = 0
 
-        python_exe = Path(os.path.realpath(sys.executable))
+        if self.settings.os == "Windows":
+            python_exe = Path(sys.executable)
+        else:
+            python_exe = Path(os.path.realpath(sys.executable))
         print(python_exe)
         tc.variables["Python_EXECUTABLE"] = python_exe.as_posix()
         tc.variables["Python3_EXECUTABLE"] = python_exe.as_posix()

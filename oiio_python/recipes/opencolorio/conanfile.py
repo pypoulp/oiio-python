@@ -2,6 +2,7 @@
 
 import os
 import sys
+import platform
 from pathlib import Path
 
 from conan import ConanFile
