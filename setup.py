@@ -123,7 +123,7 @@ if __name__ == "__main__":
 
     setup(
         name=package_name,
-        version="3.0.3.1.1",
+        version="3.0.4.0.1",
         license_files=tuple(license_files),
         package_dir={"": "oiio_python"},
         packages=find_packages(where="oiio_python"),

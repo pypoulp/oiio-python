@@ -16,21 +16,56 @@
      add_subdirectory (src/iv)
  endif ()
  
-@@ -295,11 +293,9 @@
+--- src/cmake/pythonutils.cmake
++++ src/cmake/pythonutils.cmake
+@@ -10,8 +10,10 @@
+ set (PYMODULE_SUFFIX "" CACHE STRING "Suffix to add to Python module init namespace")
+ if (WIN32)
+     set (PYLIB_LIB_TYPE SHARED CACHE STRING "Type of library to build for python module (MODULE or SHARED)")
++    set (PY_DEV_REQUIRED Development)
  else ()
-     set (_py_dev_found Python3_Development.Module_FOUND)
+     set (PYLIB_LIB_TYPE MODULE CACHE STRING "Type of library to build for python module (MODULE or SHARED)")
++    set (PY_DEV_REQUIRED Development.Module)
  endif ()
--if (USE_PYTHON AND ${_py_dev_found} AND NOT BUILD_OIIOUTIL_ONLY)
--    add_subdirectory (src/python)
--else ()
--    message (STATUS "Not building Python bindings: USE_PYTHON=${USE_PYTHON}, Python3_Development.Module_FOUND=${Python3_Development.Module_FOUND}")
--endif ()
-+
-+add_subdirectory (src/python)
-+
  
- add_subdirectory (src/include)
- if (BUILD_DOCS)
+ 
+@@ -33,23 +35,13 @@
+         endif ()
+     endif ()
+ 
+-    # Support building on manylinux docker images, which do not contain
+-    # the Development.Embedded component.
+-    # https://pybind11.readthedocs.io/en/stable/compiling.html#findpython-mode
+-    if (WIN32)
+-        set (_py_components Interpreter Development)
+-    else ()
+-        set (_py_components Interpreter Development.Module)
+-    endif ()
+ 
+     checked_find_package (Python3 ${PYTHON_VERSION}
+                           ${_req}
+                           VERSION_MIN 3.7
+-                          COMPONENTS ${_py_components}
++                          COMPONENTS Interpreter ${PY_DEV_REQUIRED}
+                           PRINT Python3_VERSION Python3_EXECUTABLE
+                                 Python3_LIBRARIES
+-                                Python3_Development_FOUND
+-                                Python3_Development.Module_FOUND
+                                 Python3_Interpreter_FOUND )
+ 
+     # The version that was found may not be the default or user
+@@ -61,9 +53,8 @@
+     set (PythonInterp3_FIND_VERSION PYTHON_VERSION_FOUND)
+     set (PythonInterp3_FIND_VERSION_MAJOR ${Python3_VERSION_MAJOR})
+ 
+-    if (NOT DEFINED PYTHON_SITE_DIR)
+-        set (PYTHON_SITE_DIR "${CMAKE_INSTALL_LIBDIR}/python${PYTHON_VERSION_FOUND}/site-packages/OpenImageIO")
+-    endif ()
++    set (PYTHON_SITE_DIR "${CMAKE_INSTALL_LIBDIR}/python${PYTHON_VERSION_FOUND}/site-packages/OpenImageIO")
++    
+     message (VERBOSE "    Python site packages dir ${PYTHON_SITE_DIR}")
+     message (VERBOSE "    Python to include 'lib' prefix: ${PYLIB_LIB_PREFIX}")
+     message (VERBOSE "    Python to include SO version: ${PYLIB_INCLUDE_SONAME}")
 --- src/cmake/externalpackages.cmake
 +++ src/cmake/externalpackages.cmake
 @@ -50,16 +50,26 @@
@@ -98,7 +133,7 @@
                        VERSION_MIN 0.20.0
                        PRINT LibRaw_r_LIBRARIES)
  
-@@ -221,18 +231,19 @@
+@@ -221,19 +231,21 @@
  
  
  # Tessil/robin-map
@@ -107,8 +142,9 @@
                        VERSION_MIN 1.2.0
                        BUILD_LOCAL missing
                       )
-+set (ROBINMAP_INCLUDES ${tsl-robin-map_INCLUDE_DIRS})
  
++set (ROBINMAP_INCLUDES ${tsl-robin-map_INCLUDE_DIRS})
++
  # fmtlib
 -option (OIIO_INTERNALIZE_FMT "Copy fmt headers into <install>/include/OpenImageIO/detail/fmt" ON)
 +option (OIIO_INTERNALIZE_FMT "Copy fmt headers into <install>/include/OpenImageIO/detail/fmt" OFF)
@@ -117,60 +153,31 @@
                        BUILD_LOCAL missing
                       )
 -get_target_property(FMT_INCLUDE_DIR fmt::fmt-header-only INTERFACE_INCLUDE_DIRECTORIES)
+-
++
 +get_target_property(FMT_INCLUDE_DIR fmt::fmt INTERFACE_INCLUDE_DIRECTORIES)
  
- 
  ###########################################################################
---- src/cmake/pythonutils.cmake
-+++ src/cmake/pythonutils.cmake
-@@ -10,8 +10,10 @@
- set (PYMODULE_SUFFIX "" CACHE STRING "Suffix to add to Python module init namespace")
- if (WIN32)
-     set (PYLIB_LIB_TYPE SHARED CACHE STRING "Type of library to build for python module (MODULE or SHARED)")
-+    set (PY_DEV_REQUIRED Development)
- else ()
-     set (PYLIB_LIB_TYPE MODULE CACHE STRING "Type of library to build for python module (MODULE or SHARED)")
-+    set (PY_DEV_REQUIRED Development.Module)
+ 
+--- src/ptex.imageio/CMakeLists.txt
++++ src/ptex.imageio/CMakeLists.txt
+@@ -9,5 +9,6 @@
+     endif()
+     add_oiio_plugin (ptexinput.cpp
+                      LINK_LIBRARIES ${ptex_target} ZLIB::ZLIB
++                     INCLUDE_DIRS ${ptex_INCLUDE_DIRS}
+                      DEFINITIONS "USE_PTEX")
  endif ()
- 
- 
-@@ -45,7 +47,7 @@
-     checked_find_package (Python3 ${PYTHON_VERSION}
-                           ${_req}
-                           VERSION_MIN 3.7
--                          COMPONENTS ${_py_components}
-+                          COMPONENTS Interpreter ${PY_DEV_REQUIRED}
-                           PRINT Python3_VERSION Python3_EXECUTABLE
-                                 Python3_LIBRARIES
-                                 Python3_Development_FOUND
-@@ -61,9 +63,8 @@
-     set (PythonInterp3_FIND_VERSION PYTHON_VERSION_FOUND)
-     set (PythonInterp3_FIND_VERSION_MAJOR ${Python3_VERSION_MAJOR})
- 
--    if (NOT DEFINED PYTHON_SITE_DIR)
--        set (PYTHON_SITE_DIR "${CMAKE_INSTALL_LIBDIR}/python${PYTHON_VERSION_FOUND}/site-packages/OpenImageIO")
--    endif ()
-+    set (PYTHON_SITE_DIR "${CMAKE_INSTALL_LIBDIR}/python${PYTHON_VERSION_FOUND}/site-packages/OpenImageIO")
-+
-     message (VERBOSE "    Python site packages dir ${PYTHON_SITE_DIR}")
-     message (VERBOSE "    Python to include 'lib' prefix: ${PYLIB_LIB_PREFIX}")
-     message (VERBOSE "    Python to include SO version: ${PYLIB_INCLUDE_SONAME}")
-@@ -159,4 +160,3 @@
-     install(FILES __init__.py DESTINATION ${PYTHON_SITE_DIR} COMPONENT user)
- 
- endmacro ()
--
 --- src/heif.imageio/CMakeLists.txt
 +++ src/heif.imageio/CMakeLists.txt
-@@ -2,33 +2,8 @@
- # SPDX-License-Identifier: Apache-2.0
+@@ -3,31 +3,8 @@
  # https://github.com/AcademySoftwareFoundation/OpenImageIO
  
--if (Libheif_FOUND)
+ if (Libheif_FOUND)
 -    if (LINKSTATIC)
 -        set (_static_suffixes .lib .a)    
 -        set (_static_libraries_found 0)
- 
+-
 -        foreach (_libeheif_library IN LISTS LIBHEIF_LIBRARIES)
 -            get_filename_component (_ext ${_libeheif_library} LAST_EXT)
 -            list (FIND _static_suffixes ${_ext} _index)
@@ -178,7 +185,7 @@
 -                MATH (EXPR _static_libraries_found "${static_libraries_found}+1")
 -            endif()
 -        endforeach()
- 
+-
 -        if (${_static_libraries_found} GREATER 0)
 -            message (STATUS "${ColorYellow}")
 -            message (STATUS "You are linking OpenImageIO against a static version of libheif, which is LGPL")
@@ -189,16 +196,42 @@
 -        endif()
 -    endif()
 -
--    add_oiio_plugin (heifinput.cpp heifoutput.cpp
+     add_oiio_plugin (heifinput.cpp heifoutput.cpp
 -                     INCLUDE_DIRS ${LIBHEIF_INCLUDES}
 -                     LINK_LIBRARIES ${LIBHEIF_LIBRARIES}
--                     DEFINITIONS "USE_HEIF=1")
++                     LINK_LIBRARIES libheif::heif
+                      DEFINITIONS "USE_HEIF=1")
+ else ()
+     message (WARNING "heif plugin will not be built")
+--- src/raw.imageio/CMakeLists.txt
++++ src/raw.imageio/CMakeLists.txt
+@@ -2,12 +2,7 @@
+ # SPDX-License-Identifier: Apache-2.0
+ # https://github.com/AcademySoftwareFoundation/OpenImageIO
+ 
+-if (LIBRAW_FOUND)
+-    add_oiio_plugin (rawinput.cpp
+-                     INCLUDE_DIRS ${LibRaw_INCLUDE_DIR}
+-                     LINK_LIBRARIES ${LibRaw_r_LIBRARIES}
+-                     COMPILE_OPTIONS ${LibRaw_r_DEFINITIONS}
+-                     DEFINITIONS "USE_LIBRAW=1")
 -else ()
--    message (WARNING "heif plugin will not be built")
+-    message (WARNING "Raw plugin will not be built")
 -endif ()
-+add_oiio_plugin (heifinput.cpp heifoutput.cpp
-+                    LINK_LIBRARIES libheif::heif
-+                    DEFINITIONS "USE_HEIF=1")
++add_oiio_plugin (rawinput.cpp
++                    INCLUDE_DIRS ${libraw_INCLUDE_DIR}
++                    LINK_LIBRARIES libraw::libraw
++                    DEFINITIONS "USE_LIBRAW=1" ${LibRaw_r_DEFINITIONS})
+--- src/jpeg.imageio/CMakeLists.txt
++++ src/jpeg.imageio/CMakeLists.txt
+@@ -15,6 +15,6 @@
+                  LINK_LIBRARIES
+                      $<TARGET_NAME_IF_EXISTS:libjpeg-turbo::jpeg>
+                      $<TARGET_NAME_IF_EXISTS:JPEG::JPEG>
+-                     ${LIBUHDR_LIBRARY}
++                     libuhdr::libuhdr
+                  DEFINITIONS "${UHDR_DEFS}"
+                  )
 --- src/include/CMakeLists.txt
 +++ src/include/CMakeLists.txt
 @@ -49,7 +49,7 @@
@@ -210,27 +243,6 @@
      set (fmt_headers_base_names)
      foreach (header_name core.h format-inl.h format.h ostream.h printf.h
               std.h base.h chrono.h)
---- src/jpeg.imageio/CMakeLists.txt
-+++ src/jpeg.imageio/CMakeLists.txt
-@@ -15,6 +15,6 @@
-                  LINK_LIBRARIES
-                      $<TARGET_NAME_IF_EXISTS:libjpeg-turbo::jpeg>
-                      $<TARGET_NAME_IF_EXISTS:JPEG::JPEG>
--                     ${LIBUHDR_LIBRARY}
-+                     libuhdr::libuhdr
-                  DEFINITIONS "${UHDR_DEFS}"
-                  )
---- src/jpeg2000.imageio/CMakeLists.txt
-+++ src/jpeg2000.imageio/CMakeLists.txt
-@@ -5,7 +5,7 @@
- if (OPENJPEG_FOUND)
-     add_oiio_plugin (jpeg2000input.cpp jpeg2000output.cpp
-                      INCLUDE_DIRS ${OPENJPEG_INCLUDES}
--                     LINK_LIBRARIES ${OPENJPEG_LIBRARIES}
-+                     LINK_LIBRARIES openjp2
-                      DEFINITIONS "USE_OPENJPEG")
- else()
-     message (WARNING "Jpeg-2000 plugin will not be built")
 --- src/jpegxl.imageio/CMakeLists.txt
 +++ src/jpegxl.imageio/CMakeLists.txt
 @@ -2,11 +2,7 @@
@@ -251,7 +263,7 @@
 +                    DEFINITIONS "USE_JXL")
 --- src/libOpenImageIO/CMakeLists.txt
 +++ src/libOpenImageIO/CMakeLists.txt
-@@ -161,12 +161,25 @@
+@@ -161,12 +161,24 @@
              OpenColorIO::OpenColorIO
              $<TARGET_NAME_IF_EXISTS:OpenColorIO::OpenColorIOHeaders>
              $<TARGET_NAME_IF_EXISTS:pugixml::pugixml>
@@ -274,10 +286,18 @@
 +if (USE_FREETYPE)
 +    target_link_libraries (OpenImageIO PRIVATE Freetype::Freetype)
 +endif()
-+
  
  if (WIN32)
      target_link_libraries (OpenImageIO PRIVATE psapi)
+--- src/openvdb.imageio/CMakeLists.txt
++++ src/openvdb.imageio/CMakeLists.txt
+@@ -6,5 +6,5 @@
+     add_oiio_plugin (openvdbinput.cpp
+                      INCLUDE_DIRS  ${OPENVDB_INCLUDES} ${TBB_INCLUDE_DIRS}
+                      LINK_LIBRARIES  ${OPENVDB_LIBRARIES}
+-                                     $<TARGET_NAME_IF_EXISTS:TBB::tbb>)
++                                     $<TARGET_NAME_IF_EXISTS:onetbb::onetbb>)
+ endif()
 --- src/libutil/CMakeLists.txt
 +++ src/libutil/CMakeLists.txt
 @@ -58,8 +58,9 @@
@@ -287,7 +307,7 @@
 +                fmt::fmt
              PRIVATE
 -                $<TARGET_NAME_IF_EXISTS:TBB::tbb>
-+            $<TARGET_NAME_IF_EXISTS:onetbb::onetbb>
++                $<TARGET_NAME_IF_EXISTS:onetbb::onetbb>
                  ${CMAKE_DL_LIBS}
              )
  
@@ -305,40 +325,14 @@
  
      if (WIN32)
          target_compile_definitions(${targetname} PRIVATE
---- src/openvdb.imageio/CMakeLists.txt
-+++ src/openvdb.imageio/CMakeLists.txt
-@@ -6,5 +6,5 @@
-     add_oiio_plugin (openvdbinput.cpp
-                      INCLUDE_DIRS  ${OPENVDB_INCLUDES} ${TBB_INCLUDE_DIRS}
-                      LINK_LIBRARIES  ${OPENVDB_LIBRARIES}
--                                     $<TARGET_NAME_IF_EXISTS:TBB::tbb>)
-+                     $<TARGET_NAME_IF_EXISTS:onetbb::onetbb>)
- endif()
---- src/ptex.imageio/CMakeLists.txt
-+++ src/ptex.imageio/CMakeLists.txt
-@@ -9,5 +9,6 @@
-     endif()
-     add_oiio_plugin (ptexinput.cpp
-                      LINK_LIBRARIES ${ptex_target} ZLIB::ZLIB
-+                     INCLUDE_DIRS ${ptex_INCLUDE_DIRS}
-                      DEFINITIONS "USE_PTEX")
- endif ()
---- src/raw.imageio/CMakeLists.txt
-+++ src/raw.imageio/CMakeLists.txt
-@@ -2,12 +2,7 @@
- # SPDX-License-Identifier: Apache-2.0
- # https://github.com/AcademySoftwareFoundation/OpenImageIO
- 
--if (LIBRAW_FOUND)
--    add_oiio_plugin (rawinput.cpp
--                     INCLUDE_DIRS ${LibRaw_INCLUDE_DIR}
--                     LINK_LIBRARIES ${LibRaw_r_LIBRARIES}
--                     COMPILE_OPTIONS ${LibRaw_r_DEFINITIONS}
--                     DEFINITIONS "USE_LIBRAW=1")
--else ()
--    message (WARNING "Raw plugin will not be built")
--endif ()
-+add_oiio_plugin (rawinput.cpp
-+                    INCLUDE_DIRS ${libraw_INCLUDE_DIR}
-+                    LINK_LIBRARIES libraw::libraw
-+                    DEFINITIONS "USE_LIBRAW=1" ${LibRaw_r_DEFINITIONS})
+--- src/jpeg2000.imageio/CMakeLists.txt
++++ src/jpeg2000.imageio/CMakeLists.txt
+@@ -5,7 +5,7 @@
+ if (OPENJPEG_FOUND)
+     add_oiio_plugin (jpeg2000input.cpp jpeg2000output.cpp
+                      INCLUDE_DIRS ${OPENJPEG_INCLUDES}
+-                     LINK_LIBRARIES ${OPENJPEG_LIBRARIES}
++                     LINK_LIBRARIES openjp2
+                      DEFINITIONS "USE_OPENJPEG")
+ else()
+     message (WARNING "Jpeg-2000 plugin will not be built")

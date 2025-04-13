@@ -157,9 +157,10 @@ class OpenImageIOConan(ConanFile):
         # if self.settings.os == "Linux":
         #     tc.variables["DCOMPILER_SUPPORTS_ATOMIC_WITHOUT_LIBATOMIC_EXITCODE"] = 0
 
-        print(Path(sys.executable).as_posix())
-        tc.variables["Python_EXECUTABLE"] = Path(sys.executable).as_posix()
-        tc.variables["Python3_EXECUTABLE"] = Path(sys.executable).as_posix()
+        python_exe = Path(os.path.realpath(sys.executable))
+        print(python_exe)
+        tc.variables["Python_EXECUTABLE"] = python_exe.as_posix()
+        tc.variables["Python3_EXECUTABLE"] = python_exe.as_posix()
 
         tc.variables["USE_PYTHON"] = True
         tc.variables["CMAKE_DEBUG_POSTFIX"] = ""  # Needed for 2.3.x.x+ versions
