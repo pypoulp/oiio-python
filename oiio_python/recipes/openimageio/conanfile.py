@@ -15,6 +15,7 @@ from conan.tools.files import (
     get,
     rm,
     rmdir,
+    replace_in_file,
 )
 from conan.tools.microsoft import is_msvc, is_msvc_static_runtime
 
@@ -128,7 +129,7 @@ class OpenImageIOConan(ConanFile):
         # TODO: Field3D dependency
         self.requires("giflib/5.2.1")
         self.requires("libheif/1.16.2")
-        self.requires("libraw/0.21.3")
+        self.requires("libraw/0.21.4")
         self.requires("openjpeg/2.5.0")
         # self.requires("openvdb/11.0.0")
         self.requires("ptex/2.4.2")
@@ -151,6 +152,17 @@ class OpenImageIOConan(ConanFile):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
         apply_conandata_patches(self)
 
+        if os.getenv("MUSLLINUX_BUILD") == "1":
+            self.output.info("Patching 'long long' to 'int64_t' for musl compatibility")
+            replace_in_file(
+                self,
+                os.path.join(
+                    self.source_folder, "src", "include", "OpenImageIO", "typedesc.h"
+                ),
+                "#if defined(__GNUC__) && __WORDSIZE == 64 && !(defined(__APPLE__) && defined(__MACH__))",
+                "#if 1",
+            )
+
     def build_requirements(self):
         self.tool_requires("cmake/[>=3.27 <4]")
 
@@ -163,18 +175,18 @@ class OpenImageIOConan(ConanFile):
         python_exe = Path(os.path.realpath(sys.executable))
         print(f"Python executable: {python_exe}")
 
-        tc.variables["Python_EXECUTABLE"] = python_exe.as_posix()
-        tc.variables["Python3_EXECUTABLE"] = python_exe.as_posix()
+        # tc.variables["Python_EXECUTABLE"] = python_exe.as_posix()
+        # tc.variables["Python3_EXECUTABLE"] = python_exe.as_posix()
 
-        # # TEMP_WINDOWS_313
-        # tc.variables["Python3_LIBRARY"] = Path(
-        #     r"Y:\conda\envs\oiio313\libs\python313.lib"
-        # ).as_posix()
-        # tc.variables["Python3_INCLUDE_DIR"] = Path(
-        #     r"Y:\conda\envs\oiio313\include"
-        # ).as_posix()
-        # tc.variables["Python3_ROOT"] = Path(r"Y:\conda\envs\oiio313").as_posix()
-        # tc.variables["Python3_ROOT_DIR"] = Path(r"Y:\conda\envs\oiio313").as_posix()
+        # TEMP_WINDOWS_313
+        tc.variables["Python3_LIBRARY"] = Path(
+            r"Y:\conda\envs\oiio313\libs\python313.lib"
+        ).as_posix()
+        tc.variables["Python3_INCLUDE_DIR"] = Path(
+            r"Y:\conda\envs\oiio313\include"
+        ).as_posix()
+        tc.variables["Python3_ROOT"] = Path(r"Y:\conda\envs\oiio313").as_posix()
+        tc.variables["Python3_ROOT_DIR"] = Path(r"Y:\conda\envs\oiio313").as_posix()
 
         tc.variables["USE_PYTHON"] = True
         tc.variables["CMAKE_DEBUG_POSTFIX"] = ""  # Needed for 2.3.x.x+ versions

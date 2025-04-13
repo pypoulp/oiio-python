@@ -23,7 +23,7 @@ def build_dependencies() -> None:
 
     # LibRaw
     libraw_dep_dir = project / "oiio_python" / "recipes" / "dependencies" / "libraw"
-    libraw_version = "0.21.3"
+    libraw_version = "0.21.4"
     conan_install_package(libraw_dep_dir, libraw_version, profile=profile_name)
     build_cleanup(libraw_dep_dir)
 
