@@ -59,6 +59,9 @@ class LibultrahdrConan(ConanFile):
             self.requires("libjpeg/9e")
         else:
             self.requires("libjpeg-turbo/3.0.4")
+    
+    def build_requirements(self):
+        self.tool_requires("cmake/[>=3.19 <4]")
 
     def generate(self):
         tc = CMakeToolchain(self)

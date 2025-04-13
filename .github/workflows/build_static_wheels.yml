@@ -22,9 +22,6 @@ jobs:
         with:
           python-version: 3.8
       
-      - name: Install Cmake 3.28.4
-        uses: lukka/get-cmake@v3.28.4
-
       - name: Set MACOSX_DEPLOYMENT_TARGET for macOS x86_64
         if: runner.os == 'macOS' && matrix.os == 'macos-13'
         run: |

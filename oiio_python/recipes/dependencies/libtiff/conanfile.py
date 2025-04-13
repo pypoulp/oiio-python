@@ -81,6 +81,9 @@ class LibtiffConan(ConanFile):
         self.requires("zstd/1.5.5")
         self.requires("libwebp/1.4.0")
 
+    def build_requirements(self):
+        self.tool_requires("cmake/[>=3.19 <4]")
+
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
 

@@ -50,6 +50,9 @@ class LibRawConan(ConanFile):
     def layout(self):
         cmake_layout(self, src_folder="src")
 
+    def build_requirements(self):
+        self.tool_requires("cmake/[>=3.19 <4]")
+
     @property
     def dont_use_jpeg_turbo(self):
         if os.getenv("MUSLLINUX_BUILD") == "1":
