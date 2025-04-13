@@ -21,7 +21,6 @@ test-command = "python {project}/test.py"
 
 [tool.cibuildwheel.macos]
 before-all = [
-  "brew install cmake",
   "python {project}/setuputils/build_dependencies.py",
 ]
 repair-wheel-command = [
