@@ -175,18 +175,18 @@ class OpenImageIOConan(ConanFile):
         python_exe = Path(os.path.realpath(sys.executable))
         print(f"Python executable: {python_exe}")
 
-        # tc.variables["Python_EXECUTABLE"] = python_exe.as_posix()
-        # tc.variables["Python3_EXECUTABLE"] = python_exe.as_posix()
+        tc.variables["Python_EXECUTABLE"] = python_exe.as_posix()
+        tc.variables["Python3_EXECUTABLE"] = python_exe.as_posix()
 
-        # TEMP_WINDOWS_313
-        tc.variables["Python3_LIBRARY"] = Path(
-            r"Y:\conda\envs\oiio313\libs\python313.lib"
-        ).as_posix()
-        tc.variables["Python3_INCLUDE_DIR"] = Path(
-            r"Y:\conda\envs\oiio313\include"
-        ).as_posix()
-        tc.variables["Python3_ROOT"] = Path(r"Y:\conda\envs\oiio313").as_posix()
-        tc.variables["Python3_ROOT_DIR"] = Path(r"Y:\conda\envs\oiio313").as_posix()
+        # # TEMP_WINDOWS_313
+        # tc.variables["Python3_LIBRARY"] = Path(
+        #     r"Y:\conda\envs\oiio313\libs\python313.lib"
+        # ).as_posix()
+        # tc.variables["Python3_INCLUDE_DIR"] = Path(
+        #     r"Y:\conda\envs\oiio313\include"
+        # ).as_posix()
+        # tc.variables["Python3_ROOT"] = Path(r"Y:\conda\envs\oiio313").as_posix()
+        # tc.variables["Python3_ROOT_DIR"] = Path(r"Y:\conda\envs\oiio313").as_posix()
 
         tc.variables["USE_PYTHON"] = True
         tc.variables["CMAKE_DEBUG_POSTFIX"] = ""  # Needed for 2.3.x.x+ versions
