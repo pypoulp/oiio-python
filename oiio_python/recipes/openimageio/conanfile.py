@@ -47,8 +47,6 @@ class OpenImageIOConan(ConanFile):
         "with_tools": True,
     }
 
-    tool_requires = "cmake/[>=3.29 <4]"
-
     def export_sources(self):
         export_conandata_patches(self)
 
@@ -153,6 +151,9 @@ class OpenImageIOConan(ConanFile):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
         apply_conandata_patches(self)
 
+    def build_requirements(self):
+        self.tool_requires("cmake/[>=3.29 <4]")
+
     def generate(self):
         tc = CMakeToolchain(self)
         # CMake options
@@ -163,9 +164,10 @@ class OpenImageIOConan(ConanFile):
             python_exe = Path(sys.executable)
         else:
             python_exe = Path(os.path.realpath(sys.executable))
-        print(python_exe)
+        python_exe = Path(os.path.realpath(sys.executable))
         tc.variables["Python_EXECUTABLE"] = python_exe.as_posix()
         tc.variables["Python3_EXECUTABLE"] = python_exe.as_posix()
+        tc.variables["Python3_FIND_STRATEGY"] = "LOCATION"
 
         tc.variables["USE_PYTHON"] = True
         tc.variables["CMAKE_DEBUG_POSTFIX"] = ""  # Needed for 2.3.x.x+ versions

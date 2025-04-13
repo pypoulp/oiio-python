@@ -1,7 +1,7 @@
 sources:
   "1.0.8":
-    url: "https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz"
-    sha256: "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269"
+    url: "https://github.com/libarchive/bzip2/archive/refs/tags/bzip2-1.0.8.tar.gz"
+    sha256: "db106b740252669664fd8f3a1c69fe7f689d5cd4b132f82ba82b9afba27627df"
   "1.0.6":
     url: "https://sourceware.org/pub/bzip2/bzip2-1.0.6.tar.gz"
     sha256: "a2848f34fcd5d6cf47def00461fcb528a0484d8edef8208d6d2e2909dc61d9cd"
