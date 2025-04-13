@@ -243,6 +243,27 @@
      set (fmt_headers_base_names)
      foreach (header_name core.h format-inl.h format.h ostream.h printf.h
               std.h base.h chrono.h)
+--- src/include/OpenImageIO/typedesc.h
++++ src/include/OpenImageIO/typedesc.h
+@@ -409,6 +409,18 @@
+ template<> struct BaseTypeFromC<unsigned long long> { static const TypeDesc::BASETYPE value = TypeDesc::UINT64; };
+ template<> struct BaseTypeFromC<long long> { static const TypeDesc::BASETYPE value = TypeDesc::INT64; };
+ #endif
++// Fix for musl
++#if defined(__linux__) && defined(__x86_64__) && defined(__GNUC__)
++template <>
++struct BaseTypeFromC<long long> {
++    static const BASETYPE value = TypeDesc::LL;
++};
++
++template <>
++struct BaseTypeFromC<unsigned long long> {
++    static const BASETYPE value = TypeDesc::ULL;
++};
++#endif
+ #if defined(_HALF_H_) || defined(IMATH_HALF_H_)
+ template<> struct BaseTypeFromC<half> { static const TypeDesc::BASETYPE value = TypeDesc::HALF; };
+ #endif
 --- src/jpegxl.imageio/CMakeLists.txt
 +++ src/jpegxl.imageio/CMakeLists.txt
 @@ -2,11 +2,7 @@
