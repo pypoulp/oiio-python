@@ -152,7 +152,7 @@ class OpenImageIOConan(ConanFile):
         apply_conandata_patches(self)
 
     def build_requirements(self):
-        self.tool_requires("cmake/[>=3.29 <4]")
+        self.tool_requires("cmake/[>=3.27 <4]")
 
     def generate(self):
         tc = CMakeToolchain(self)
@@ -160,14 +160,21 @@ class OpenImageIOConan(ConanFile):
         # if self.settings.os == "Linux":
         #     tc.variables["DCOMPILER_SUPPORTS_ATOMIC_WITHOUT_LIBATOMIC_EXITCODE"] = 0
 
-        if self.settings.os == "Windows":
-            python_exe = Path(sys.executable)
-        else:
-            python_exe = Path(os.path.realpath(sys.executable))
         python_exe = Path(os.path.realpath(sys.executable))
+        print(f"Python executable: {python_exe}")
+
         tc.variables["Python_EXECUTABLE"] = python_exe.as_posix()
         tc.variables["Python3_EXECUTABLE"] = python_exe.as_posix()
-        tc.variables["Python3_FIND_STRATEGY"] = "LOCATION"
+
+        # # TEMP_WINDOWS_313
+        # tc.variables["Python3_LIBRARY"] = Path(
+        #     r"Y:\conda\envs\oiio313\libs\python313.lib"
+        # ).as_posix()
+        # tc.variables["Python3_INCLUDE_DIR"] = Path(
+        #     r"Y:\conda\envs\oiio313\include"
+        # ).as_posix()
+        # tc.variables["Python3_ROOT"] = Path(r"Y:\conda\envs\oiio313").as_posix()
+        # tc.variables["Python3_ROOT_DIR"] = Path(r"Y:\conda\envs\oiio313").as_posix()
 
         tc.variables["USE_PYTHON"] = True
         tc.variables["CMAKE_DEBUG_POSTFIX"] = ""  # Needed for 2.3.x.x+ versions
