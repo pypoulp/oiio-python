@@ -6,7 +6,7 @@ on:
 jobs:
   build_wheels:
     name: Build ${{ matrix.linking }} wheels on ${{ matrix.distrib }}
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-22.04-arm
     strategy:
       matrix:
         distrib: [manylinux, musllinux]
