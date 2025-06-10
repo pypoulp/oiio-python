@@ -4,7 +4,6 @@ requires = [
   "setuptools>=64",
   "wheel",
   "conan==2.4.0",
-  "cmake>=3.25",
   "numpy>=1.21.2,<2.3.0",
 ]
 
