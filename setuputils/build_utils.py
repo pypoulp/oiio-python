@@ -136,8 +136,6 @@ def conan_install_package(
         profile,
     ]
 
-    install_cmd += ["--conf=tools.cmake.cmaketoolchain:policy_version=3.5"]
-
     install_cmd += build_arg_list
 
     build_cmd = [
