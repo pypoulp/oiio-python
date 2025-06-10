@@ -78,7 +78,7 @@ class LibtiffConan(ConanFile):
         self.requires("libdeflate/1.19")
         self.requires("xz_utils/[>=5.4.5 <6]")
         self.requires("jbig/20160605")
-        self.requires("zstd/1.5.7")
+        self.requires("zstd/1.5.6")
         self.requires("libwebp/1.4.0")
 
     def build_requirements(self):
