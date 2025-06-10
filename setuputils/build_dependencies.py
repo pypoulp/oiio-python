@@ -1,5 +1,6 @@
 """Build script for installing and building dependencies using Conan."""
 
+import os
 import platform
 import subprocess
 import sys
@@ -10,6 +11,8 @@ sys.path.insert(0, project.as_posix())
 
 from setuputils.build_utils import build_cleanup  # pylint: disable=C0413
 from setuputils.build_utils import conan_install_package, conan_profile_ensure
+
+os.environ["CONAN_CMAKE_TOOLCHAIN_ARGS"] = "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
 
 
 def build_dependencies() -> None:

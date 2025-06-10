@@ -34,7 +34,6 @@ repair-wheel-command = [
 before-all = [
   "chmod +x {project}/setuputils/linux_before_all.sh",
   "bash {project}/setuputils/linux_before_all.sh",
-  "export CMAKE_ARGS='-DCMAKE_POLICY_VERSION_MINIMUM=3.5'",
   "python {project}/setuputils/build_dependencies.py",
 ]
 repair-wheel-command = [
