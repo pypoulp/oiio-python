@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.23.2
+        uses: pypa/cibuildwheel@v2.23.3
         env:
           CIBW_ENVIRONMENT_PASS_LINUX: OIIO_STATIC CIBUILDWHEEL MUSLLINUX_BUILD
           MUSLLINUX_BUILD: ${{ matrix.distrib == 'musllinux' && '1' || '0' }}
