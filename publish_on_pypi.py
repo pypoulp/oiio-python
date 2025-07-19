@@ -109,7 +109,9 @@ def publish_to_pypi(repository_url, static):
     if not dist_empty:
         run_command(f"twine upload --verbose --repository {repository_url} dist/*")
     if not wheel_empty:
-        run_command(f"twine upload --verbose --repository {repository_url} {wheelhouse}/*")
+        run_command(
+            f"twine upload --verbose --repository {repository_url} {wheelhouse}/*"
+        )
 
 
 def main():

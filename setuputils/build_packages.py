@@ -49,7 +49,7 @@ def build_packages(build_static_version: bool = False) -> None:
 
     # OpenImageIO
     oiio_dir = project / "oiio_python" / "recipes" / "openimageio"
-    oiio_version = "3.0.7.0"
+    oiio_version = "3.0.8.1"
     conan_install_package(oiio_dir, oiio_version, profile=profile_name)
     build_cleanup(oiio_dir)
 

@@ -1,4 +1,7 @@
 sources:
+  "3.0.8.1":
+    url: "https://github.com/AcademySoftwareFoundation/OpenImageIO/archive/refs/tags/v3.0.8.1.tar.gz"
+    sha256: "1b9b0d27e802243c1aa490b951580d10e8be645459f8080bfa0ed6f213e1082a"
   "3.0.7.0":
     url: "https://github.com/AcademySoftwareFoundation/OpenImageIO/archive/refs/tags/v3.0.7.0.tar.gz"
     sha256: "2798e398b6ffd836ba7810e8ea510902a4aabc4a373ca0523a3f0d830c5eb103"
@@ -16,6 +19,10 @@ sources:
     sha256: "7f84c2b9c13be74c4a187fefe3844b391374ba329aa63fbbca21fa232e43c87b"
 
 patches:
+  "3.0.8.1":
+    - patch_file: "patches/3.0.8.1-001-fix-conan-build.patch"
+      patch_description: "Fix build with Conan"
+      patch_type: "conan"
   "3.0.7.0":
     - patch_file: "patches/3.0.7.0-001-fix-conan-build.patch"
       patch_description: "Fix build with Conan"
