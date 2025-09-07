@@ -45,8 +45,8 @@ if __name__ == "__main__":
 
     if "bdist_wheel" in sys.argv:
         # When running on Cibuildwheel, avoid rebuilding dependencies for each version.
-        if os.getenv("CIBUILDWHEEL") != "1":
-            build_dependencies()
+        # if os.getenv("CIBUILDWHEEL") != "1":
+        #     build_dependencies()
         # Build OpenColorIO and OpenImageIO
         build_packages(static_build)
         # Fix shared libraries on macos
@@ -120,10 +120,17 @@ if __name__ == "__main__":
     package_name = "oiio-static-python" if static_build else "oiio-python"
 
     long_description = (here / "README.md").read_text(encoding="utf8")
+    
+    # Use SPDX license expression instead of deprecated classifiers
+    if static_build:
+        license_expr = "Apache-2.0 OR GPL-3.0-only"
+    else:
+        license_expr = "Apache-2.0"
 
     setup(
         name=package_name,
-        version="3.0.8.1.1",
+        version="3.0.10.0.1",
+        license=license_expr,
         license_files=tuple(license_files),
         package_dir={"": "oiio_python"},
         packages=find_packages(where="oiio_python"),
@@ -152,8 +159,6 @@ if __name__ == "__main__":
             "Programming Language :: Python :: 3.13",
             "Programming Language :: C++",
             "Programming Language :: Python :: Implementation :: CPython",
-            "License :: OSI Approved :: Apache Software License",
-            "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         ],
         python_requires=">=3.8,<3.14",
         install_requires=[
