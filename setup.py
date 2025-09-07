@@ -45,8 +45,8 @@ if __name__ == "__main__":
 
     if "bdist_wheel" in sys.argv:
         # When running on Cibuildwheel, avoid rebuilding dependencies for each version.
-        # if os.getenv("CIBUILDWHEEL") != "1":
-        #     build_dependencies()
+        if os.getenv("CIBUILDWHEEL") != "1":
+            build_dependencies()
         # Build OpenColorIO and OpenImageIO
         build_packages(static_build)
         # Fix shared libraries on macos

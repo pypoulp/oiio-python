@@ -172,21 +172,53 @@ class OpenImageIOConan(ConanFile):
         # if self.settings.os == "Linux":
         #     tc.variables["DCOMPILER_SUPPORTS_ATOMIC_WITHOUT_LIBATOMIC_EXITCODE"] = 0
 
+        # Tell pybind11 to use the newer FindPython module instead of deprecated FindPythonLibs
+        tc.variables["PYBIND11_FINDPYTHON"] = True
+        
+        # Set Python paths for CMake FindPython
         python_exe = Path(os.path.realpath(sys.executable))
         print(f"Python executable: {python_exe}")
 
         tc.variables["Python_EXECUTABLE"] = python_exe.as_posix()
         tc.variables["Python3_EXECUTABLE"] = python_exe.as_posix()
 
-        # # TEMP_WINDOWS_313
-        # tc.variables["Python3_LIBRARY"] = Path(
-        #     r"Y:\conda\envs\oiio313\libs\python313.lib"
-        # ).as_posix()
-        # tc.variables["Python3_INCLUDE_DIR"] = Path(
-        #     r"Y:\conda\envs\oiio313\include"
-        # ).as_posix()
-        # tc.variables["Python3_ROOT"] = Path(r"Y:\conda\envs\oiio313").as_posix()
-        # tc.variables["Python3_ROOT_DIR"] = Path(r"Y:\conda\envs\oiio313").as_posix()
+        # Help CMake find Python on Windows
+        if self.settings.os == "Windows": # pylint: disable=no-member
+            tc.variables["Python_ROOT_DIR"] = Path(sys.prefix).as_posix()
+            tc.variables["Python3_ROOT_DIR"] = Path(sys.prefix).as_posix()
+            
+            # Python 3.13 specific workaround - needs extra help finding libraries
+            if sys.version_info[:2] == (3, 13):
+                import sysconfig
+                
+                # Get Python paths using sysconfig (works for system, conda, venv)
+                python_root = Path(sys.prefix)
+                
+                # Find the library - try different possible locations
+                lib_dir = python_root / "libs"
+                if not lib_dir.exists():
+                    # Try alternate location (some distributions)
+                    lib_dir = python_root / "lib"
+                
+                # Python 3.13 library name
+                python_lib = lib_dir / f"python{sys.version_info.major}{sys.version_info.minor}.lib"
+                if not python_lib.exists():
+                    # Try with full version
+                    python_lib = lib_dir / f"python{sys.version_info.major}.{sys.version_info.minor}.lib"
+                
+                # Get include directory
+                include_dir = Path(sysconfig.get_path('include'))
+                
+                print(f"Python 3.13 Windows workaround:")
+                print(f"  Root: {python_root}")
+                print(f"  Library: {python_lib}")
+                print(f"  Include: {include_dir}")
+                
+                if python_lib.exists():
+                    tc.variables["Python3_LIBRARY"] = python_lib.as_posix()
+                
+                if include_dir.exists():
+                    tc.variables["Python3_INCLUDE_DIR"] = include_dir.as_posix()
 
         tc.variables["USE_PYTHON"] = True
         tc.variables["CMAKE_DEBUG_POSTFIX"] = ""  # Needed for 2.3.x.x+ versions

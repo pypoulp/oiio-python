@@ -133,8 +133,42 @@ class OpenColorIOConan(ConanFile):
         tc = CMakeToolchain(self)
         tc.cppstd = default_cppstd(self)
 
-        tc.variables["Python_EXECUTABLE"] = Path(sys.executable).as_posix()
-        tc.variables["Python3_EXECUTABLE"] = Path(sys.executable).as_posix()
+        # Tell pybind11 to use the newer FindPython module instead of deprecated FindPythonLibs
+        tc.variables["PYBIND11_FINDPYTHON"] = True
+        
+        # Set Python paths for CMake FindPython
+        python_exe = Path(os.path.realpath(sys.executable))
+        tc.variables["Python_EXECUTABLE"] = python_exe.as_posix()
+        tc.variables["Python3_EXECUTABLE"] = python_exe.as_posix()
+        
+        # Help CMake find Python on Windows
+        if self.settings.os == "Windows":  # pylint: disable=no-member
+            tc.variables["Python_ROOT_DIR"] = Path(sys.prefix).as_posix()
+            tc.variables["Python3_ROOT_DIR"] = Path(sys.prefix).as_posix()
+            
+            # Python 3.13 specific workaround (same as OpenImageIO)
+            if sys.version_info[:2] == (3, 13):
+                import sysconfig
+                python_root = Path(sys.prefix)
+                lib_dir = python_root / "libs"
+                if not lib_dir.exists():
+                    lib_dir = python_root / "lib"
+                
+                python_lib = lib_dir / f"python{sys.version_info.major}{sys.version_info.minor}.lib"
+                if not python_lib.exists():
+                    python_lib = lib_dir / f"python{sys.version_info.major}.{sys.version_info.minor}.lib"
+                
+                include_dir = Path(sysconfig.get_path('include'))
+                
+                print(f"Python 3.13 Windows workaround for OpenColorIO:")
+                print(f"  Root: {python_root}")
+                print(f"  Library: {python_lib}")
+                print(f"  Include: {include_dir}")
+                
+                if python_lib.exists():
+                    tc.variables["Python3_LIBRARY"] = python_lib.as_posix()
+                if include_dir.exists():
+                    tc.variables["Python3_INCLUDE_DIR"] = include_dir.as_posix()
 
         tc.variables["OCIO_BUILD_PYTHON"] = True
         tc.variables["CMAKE_VERBOSE_MAKEFILE"] = True
