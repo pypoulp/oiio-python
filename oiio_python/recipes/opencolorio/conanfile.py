@@ -1,8 +1,8 @@
 # pylint: disable=E1101,C0114,C0115,C0116
 
 import os
-import sys
 import platform
+import sys
 from pathlib import Path
 
 from conan import ConanFile
@@ -70,6 +70,9 @@ class OpenColorIOConan(ConanFile):
 
     def layout(self):
         cmake_layout(self, src_folder="src")
+
+    def build_requirements(self):
+        self.tool_requires("cmake/[>=3.27 <4]")
 
     def requirements(self):
         self.requires("expat/[>=2.6.2 <3]")

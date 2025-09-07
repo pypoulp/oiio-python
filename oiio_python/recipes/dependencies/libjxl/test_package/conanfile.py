@@ -16,6 +16,9 @@ class TestPackageConan(ConanFile):
     def layout(self):
         cmake_layout(self)
 
+    def build_requirements(self):
+        self.tool_requires("cmake/[>=3.19 <4]")
+
     def build(self):
         cmake = CMake(self)
         cmake.configure()

@@ -1,3 +1,6 @@
+import os
+import textwrap
+
 from conan import ConanFile
 from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
 from conan.tools.files import (
@@ -8,8 +11,6 @@ from conan.tools.files import (
     save,
 )
 from conan.tools.scm import Version
-import os
-import textwrap
 
 required_conan_version = ">=1.53.0"
 

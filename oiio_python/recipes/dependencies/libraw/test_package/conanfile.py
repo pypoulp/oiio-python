@@ -23,6 +23,9 @@ class TestPackageConan(ConanFile):
         cmake.configure()
         cmake.build()
 
+    def build_requirements(self):
+        self.tool_requires("cmake/[>=3.19 <4]")
+
     def test(self):
         if can_run(self):
             bin_path = os.path.join(self.cpp.build.bindirs[0], "test_package")
